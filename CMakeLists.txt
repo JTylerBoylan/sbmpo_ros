@@ -21,14 +21,8 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
-   src/planner.cpp
-)
-
-add_executable(sbmpo src/planning_node.cpp)
-target_link_libraries(sbmpo ${catkin_LIBRARIES} ${PROJECT_NAME})
-
-catkin_install_python(PROGRAMS
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+   src/sbmpo.cpp
+   src/sbmpo_util.cpp
 )
 
 

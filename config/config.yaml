@@ -1,0 +1,7 @@
+states:
+  - 'X':
+    range: [-inf inf]
+    implicit_grid: true
+    implicit_grid_resolution: 1.0
+    implicit_grid_size: 100
+
