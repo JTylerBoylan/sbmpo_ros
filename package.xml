@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>sbmpo_ros</name>
+  <version>1.0.0</version>
+  <description>SBMPO Planner</description>
+
+  <maintainer email="jboylan@fsu.edu">Jonathan T. Boylan</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>grid_map_ros</depend>
+  <depend>roscpp</depend>
+  <depend>nav_msgs</depend>
+
+</package>
