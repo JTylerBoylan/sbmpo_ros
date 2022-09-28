@@ -1,5 +1,7 @@
 states:
   - 'X':
+    intial_value: 0.0
+    goal_value: 10.0
     range: [-inf inf]
     implicit_grid: true
     implicit_grid_resolution: 1.0

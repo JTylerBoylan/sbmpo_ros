@@ -48,4 +48,22 @@ namespace sbmpo {
         return toGridIndex(key, grid_size);
     }
 
+    int getTotalGridSize(const GridSize &grid_size) {
+        int size = 1;
+        for (int i = 0; i < grid_size.size(); i++)
+            size *= grid_size[i];
+        return size;
+    }
+
+    Node generateStartingNode(const StateInfoList &states) {
+        Node starting_node;
+        for (int i = 0; i < states.size(); i++)
+            starting_node.state.push_back(states[i].initial_value);
+        starting_node.id = 0;
+        starting_node.parent_id = -1;
+        starting_node.generation = 0;
+        starting_node.control = {h(starting_node.state), 0.0};
+        return starting_node;
+    }
+
 }

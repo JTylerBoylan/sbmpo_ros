@@ -19,7 +19,7 @@ namespace sbmpo {
 
 
     /*
-        Utility for storing vertex information
+        Utility for storing node information
     */
 
     struct Node {
@@ -29,6 +29,16 @@ namespace sbmpo {
         int parent_id;
         int generation;
     };
+
+    /*
+        Utility for heuristics
+    */
+
+    // G score of a given state
+    float dg(const State &state1, const State &state2);
+
+    // H score of a given state
+    float h(const State &state);
 
 
     /*
@@ -62,6 +72,9 @@ namespace sbmpo {
     // Convert state position directly to buffer index
     int toGridIndex(const State &state, const GridResolution &resolution, const GridSize &grid_size);
 
+    // Get total grid size
+    int getTotalGridSize(const GridSize &grid_size);
+
     /*
         Utility for configuring planner
     */
@@ -69,12 +82,18 @@ namespace sbmpo {
     struct StateInfo {
         std::string name;
         double range[2];
+        float initial_value;
+        float goal_value;
         bool grid;
         float grid_resolution;
         int grid_size;
     };
 
-    void configure(std::vector<StateInfo> &states);
+    typedef std::vector<StateInfo> StateInfoList;
+
+    void configure(StateInfoList &states, GridSize &grid_size, GridResolution &grid_resolution);
+
+    Node generateStartingNode(const StateInfoList &states);
 
 }
 

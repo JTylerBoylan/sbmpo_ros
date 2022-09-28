@@ -28,14 +28,24 @@ namespace sbmpo {
             // Buffer array for all nodes
             Node * buffer;
 
-            // Array to store state information
-            std::vector<StateInfo> states;
+            // List to store state information
+            StateInfoList states;
 
             // Maximum iterations of planner
             int max_iterations;
 
             // Sample size
             int sample_size;
+
+            // Implicit grid size
+            GridSize implicit_grid_size;
+
+            // Implicit grid resolution
+            GridResolution implicit_grid_resolution;
+
+            // Goal radius
+            float goal_radius;
+
     };
 
 }
