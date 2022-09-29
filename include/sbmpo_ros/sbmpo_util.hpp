@@ -3,39 +3,15 @@
 
 #define HALTON_MAX_DIMENSIONS 10
 
+#include <sbmpo_ros/sbmpo_types.hpp>
 #include <math.h>
-#include <vector>
-#include <array>
 #include <rand.h>
 #include <time.h>
 
 namespace sbmpo {
 
-    // State: n-dimensional array of state positions
-    typedef std::vector<float> State;
-
-    // Control: n-dimensional array of controls
-    typedef std::vector<float> Control;
-
-    // Control: Stores the g & f scores
-    typedef std::array<float, 2> Heuristic;
-
-
     /*
-        Utility for storing node information
-    */
-
-    struct Node {
-        State state;
-        Control control;
-        Heuristic heuristic;
-        int id;
-        int parent_id;
-        int generation;
-    };
-
-    /*
-        Utility for heuristics
+        Heuristics Functions
     */
 
     // Determine if state is goal
@@ -49,26 +25,25 @@ namespace sbmpo {
 
 
     /*
-        Utility for generating samples
+        Sample Generation Functions
     */
 
     // Stores primes used in Halton sampling
     const int primes[HALTON_MAX_DIMENSIONS] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29}; 
 
     // Generate Halton samples
-    std::vector<double> generateHaltonSamples(const unsigned int i, const int n);
+    Control generateHaltonSamples(const unsigned int i, const int n);
 
     // Generate random samples
-    std::vector<double> generateRandomSamples(const int n, const unsigned int seed = time(NULL));
+    Control generateRandomSamples(const int n, const unsigned int seed = time(NULL));
+
+    // Determine if rand() has been seeded
+    static bool seeded_rand = false;
 
 
     /*
-        Utility for implicit gridding
+        Implicit Grid Functions
     */
-
-   typedef std::vector<int> GridKey;
-   typedef std::vector<float> GridResolution;
-   typedef std::vector<int> GridSize;
 
     // Convert state position to implicit grid key
     void toGridKey(const State &state, const GridResolution &resolution, GridKey &key);
@@ -76,37 +51,25 @@ namespace sbmpo {
     // Convert implicit grid key to buffer index
     int toGridIndex(const GridKey &key, const GridSize &grid_size);
 
-    // Convert state position directly to buffer index
-    int toGridIndex(const State &state, const GridResolution &resolution, const GridSize &grid_size);
+    // Convert state position directly to node buffer index
+    int toNodeIndex(const State &state, const ImplicitGrid &grid);
 
     // Get total grid size
     int getTotalGridSize(const GridSize &grid_size);
 
+
     /*
-        Utility for configuring planner
+        Planner Control Functions
     */
 
-    struct StateInfo {
-        std::string name;
-        double range[2];
-        float initial_value;
-        float goal_value;
-        bool grid;
-        float grid_resolution;
-        int grid_size;
-    };
+    // Initialize the planner with given options
+    void initialize(Planner &planner, const PlannerOptions &options);
 
-    struct ControlInfo {
-        std::string name;
-        double range[2];
-    };
+    // Reset planner
+    void reset(Planner &planner);
 
-    typedef std::vector<StateInfo> StateInfoList;
-    typedef std::vector<ControlInfo> ControlInfoList;
-
-    void configure(StateInfoList &states, ControlInfoList &controls, GridSize &grid_size, GridResolution &grid_resolution);
-
-    Node generateStartingNode(const StateInfoList &states, const ControlInfoList &controls);
+    // Generate the starting
+    Node generateStartingNode(const PlannerOptions &options);
 
 }
 

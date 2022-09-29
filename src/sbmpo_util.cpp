@@ -2,8 +2,8 @@
 
 namespace sbmpo {
 
-    std::vector<double> generateHaltonSamples(const unsigned int i, const int n) {
-        std::vector<double> samples;
+    Control generateHaltonSamples(const unsigned int i, const int n) {
+        Control samples;
         double x;
         int k, p, num;
         for (int j = 0; j < n; j++) {
@@ -17,9 +17,12 @@ namespace sbmpo {
         return samples;
     }
 
-    std::vector<double> generateRandomSamples(const int n, const unsigned int seed = time(NULL)) {
-        srand(seed);
-        std::vector<double> samples;
+    Control generateRandomSamples(const int n, const unsigned int seed = time(NULL)) {
+        if (!seeded_rand) {
+            srand(seed);
+            seeded_rand = true;
+        }
+        Control samples;
         for (int j = 0; j < n; j++)
             samples.push_back(double(rand()) / RAND_MAX);
         return samples;
@@ -42,10 +45,10 @@ namespace sbmpo {
         return index;
     }
 
-    int toGridIndex(const State &state, const GridResolution &resolution, const GridSize &grid_size) {
+    int toGridIndex(const State &state, const ImplicitGrid &grid) {
         GridKey key;
-        toGridKey(state, resolution, key);
-        return toGridIndex(key, grid_size);
+        toGridKey(state, grid.resolution, key);
+        return toGridIndex(key, grid.size);
     }
 
     int getTotalGridSize(const GridSize &grid_size) {
@@ -55,10 +58,12 @@ namespace sbmpo {
         return size;
     }
 
-    Node generateStartingNode(const StateInfoList &states) {
+    Node generateStartingNode(const PlannerOptions &options) {
         Node starting_node;
-        for (int i = 0; i < states.size(); i++)
-            starting_node.state.push_back(states[i].initial_value);
+        for (int s = 0; s < options.state_info.size(); s++)
+            starting_node.state.push_back(options.state_info[s].initial_value);
+        for (int c = 0; c < options.control_info.size(); c++)
+            starting_node.control.push_back(options.control_info[c].initial_value);
         starting_node.id = 0;
         starting_node.parent_id = -1;
         starting_node.generation = 0;
