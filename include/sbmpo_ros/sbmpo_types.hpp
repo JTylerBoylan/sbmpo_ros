@@ -53,15 +53,19 @@ namespace sbmpo {
     // Type to indicate array is a range
     typedef std::array<float, 2> Range;
 
+    // Enum to hold overflow types
+    enum OverflowType {BREAK, WRAP};
+
     // Type to hold pointer to control equation
     typedef float (*ControlEquation)(float*, float*);
 
     // Struct to hold state information
     struct StateInfo {
         std::string name;
-        Range range;
         float initial_value;
         Range goal_value;
+        Range range;
+        OverflowType overflow;
         bool defined_goal;
         bool grid;
         float grid_resolution;
@@ -76,6 +80,9 @@ namespace sbmpo {
         Range range;
     };
 
+    // Enum to hold different sampling types
+    enum SampleType {INPUT, RANDOM, HALTON};
+
     // Types for sample storage
     typedef std::vector<std::vector<float>> SampleList;
 
@@ -88,7 +95,7 @@ namespace sbmpo {
         int max_iterations;
         int max_generations;
         int sample_size;
-        std::string sample_type;
+        SampleType sample_type;
         SampleList sample_list; // Only used if sample type is 'input'
         StateInfoList state_info;
         ControlInfoList control_info;

@@ -87,6 +87,16 @@ namespace sbmpo {
     // Delete buffers
     void deconstruct(Planner &planner);
 
+    /*
+        Conversions
+    */
+
+    // Convert string to sample type
+    SampleType toSampleType(const std::string &type);
+
+    // Convert string to overflow type
+    OverflowType toOverflowType(const std::string &type);
+
 }
 
 #endif

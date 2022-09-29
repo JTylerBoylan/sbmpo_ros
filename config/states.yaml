@@ -9,14 +9,7 @@ states:
       active: true
       resolution: 1.0
       size: 141
-    control:
-      - add:
-        - 'X'
-        - multiply:
-          - cosine: 
-            - 'W'
-          - 'V'
-          - 'sample_time_increment'
+
   - name: 'Y'
     value:
       initial: 20.0
@@ -27,30 +20,17 @@ states:
       active: true
       resolution: 1.0
       size: 141
-    control:
-      - add:
-        - 'Y'
-        - multiply:
-          - sine: 
-            - 'W'
-          - 'V'
-          - 'sample_time_increment'
+
   - name: 'W'
     value:
       initial: 3.9270
-      goal: [-1]
-      range: [0, 6.2832]
+      goal: [-1.0]
+      range: [0.0, 6.2832]
       overflow: 'wrap'
     implicit_grid:
       active: true
       resolution: 0.26180
       size: 24
-    control:
-      - add:
-        - 'W'
-        - multiply:
-          - 'U'
-          - 'sample_time_increment'
 
 controls:
   - name: 'V'

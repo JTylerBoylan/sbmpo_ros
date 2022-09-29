@@ -170,4 +170,26 @@ namespace sbmpo {
         delete[] planner.grid.buffer;
     }
 
+    /*
+        Conversions
+    */
+
+    SampleType toSampleType(const std::string &type) {
+        if (type == "input")
+            return SampleType::INPUT;
+        if (type == "random")
+            return SampleType::RANDOM;
+        if (type == "halton")
+            return SampleType::HALTON;
+        return SampleType::INPUT;
+    }
+
+    OverflowType toOverflowType(const std::string &type) {
+        if (type == "break")
+            return OverflowType::BREAK;
+        if (type == "wrap")
+            return OverflowType::WRAP;
+        return OverflowType::BREAK;
+    }
+
 }
