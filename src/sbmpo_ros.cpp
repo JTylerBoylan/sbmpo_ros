@@ -78,14 +78,14 @@ namespace sbmpo {
 
     void generateSampleList(SampleList &sample_list, const XmlRpc::XmlRpcValue &samples) {
         for (int i = 0; i < samples.size(); i++) {
-            std::vector<float> list;
+            Control control;
             XmlRpc::XmlRpcValue sample = samples[i];
             std::string list_str;
             for (int j = 0; j < sample.size(); j++) {
-                list.push_back(float(double(sample[j])));
-                list_str += " " + std::to_string(list.back());
+                control.push_back(float(double(sample[j])));
+                list_str += " " + std::to_string(control.back());
             }
-            sample_list.push_back(list);
+            sample_list.push_back(control);
             ROS_INFO("- [%s ]", list_str.c_str());
         }
     }

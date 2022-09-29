@@ -3,7 +3,7 @@
 
 #define HALTON_MAX_DIMENSIONS 10
 
-#include <sbmpo_ros/sbmpo_types.hpp>
+#include <sbmpo_ros/sbmpo_extern.hpp>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -24,7 +24,7 @@ namespace sbmpo {
     void initializeQueue(NodeQueue &queue, NodeBuffer &buffer);
 
     /*
-        Heuristics Functions
+        Node Functions
     */
 
     // Generate the starting
@@ -32,12 +32,6 @@ namespace sbmpo {
 
     // Determine if state is goal
     bool isGoal(const State &state, const StateInfoList &info_list);
-
-    // G score of a given state
-    float dg(const Node &node1, const Node &node2);
-
-    // H score of a given state
-    float h(const Node &node);
 
 
     /*
@@ -55,7 +49,6 @@ namespace sbmpo {
 
     // Determine if rand() has been seeded
     static bool seeded_rand = false;
-
 
     /*
         Implicit Grid Functions

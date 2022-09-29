@@ -84,7 +84,7 @@ namespace sbmpo {
     enum SampleType {INPUT, RANDOM, HALTON};
 
     // Types for sample storage
-    typedef std::vector<std::vector<float>> SampleList;
+    typedef std::vector<Control> SampleList;
 
     // Types for lists of states and controls
     typedef std::vector<StateInfo> StateInfoList;
