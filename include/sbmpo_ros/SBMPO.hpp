@@ -31,8 +31,14 @@ namespace sbmpo {
             // List to store state information
             StateInfoList states;
 
+            // List to store control information
+            ControlInfoList controls;
+
             // Maximum iterations of planner
             int max_iterations;
+
+            // Maximum generations of planner
+            int max_generations;
 
             // Sample size
             int sample_size;
@@ -43,8 +49,11 @@ namespace sbmpo {
             // Implicit grid resolution
             GridResolution implicit_grid_resolution;
 
-            // Goal radius
-            float goal_radius;
+            // Goal state
+            State goal;
+
+            // Best generated path
+            std::vector<int> path;
 
     };
 

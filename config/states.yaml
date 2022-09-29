@@ -1,0 +1,38 @@
+states:
+  - 'X':
+    initial_value: 122.0
+    goal_value: [65.0]
+    range: [0.0, 141.0]
+    overflow: 'break'
+    implicit_grid: true
+    implicit_grid_resolution: 1.0
+    implicit_grid_size: 141
+    control: 'Vx'
+  - 'Y':
+    initial_value: 20.0
+    goal_value: [65.0]
+    range: [0.0, 141.0]
+    overflow: 'break'
+    implicit_grid: true
+    implicit_grid_resolution: 1.0
+    control: 'Vy'
+  - 'W':
+    initial_value: 3.9270
+    goal_value: [-1]
+    range: [0, 6.2832]
+    overflow: 'wrap'
+    implicit_grid: true
+    implicit_grid_resolution: 0.26180
+    control: 'U'
+
+controls:
+  - 'Vx':
+    initial_value: 0.0
+    range: [0.0, 1.0]
+  - 'Vy':
+    initial_value: 0.0
+    range: [0.0, 1.0]
+  - 'U':
+    initial_value: 0.0
+    range: [-0.105, 0.105]
+

@@ -62,7 +62,7 @@ namespace sbmpo {
         starting_node.id = 0;
         starting_node.parent_id = -1;
         starting_node.generation = 0;
-        starting_node.control = {h(starting_node.state), 0.0};
+        starting_node.heuristic = {h(starting_node.state), 0.0};
         return starting_node;
     }
 

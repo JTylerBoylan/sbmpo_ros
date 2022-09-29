@@ -14,8 +14,11 @@ namespace sbmpo {
     // State: n-dimensional array of state positions
     typedef std::vector<float> State;
 
+    // Control: n-dimensional array of controls
+    typedef std::vector<float> Control;
+
     // Control: Stores the g & f scores
-    typedef std::array<float, 2> Control;
+    typedef std::array<float, 2> Heuristic;
 
 
     /*
@@ -25,6 +28,7 @@ namespace sbmpo {
     struct Node {
         State state;
         Control control;
+        Heuristic heuristic;
         int id;
         int parent_id;
         int generation;
@@ -33,6 +37,9 @@ namespace sbmpo {
     /*
         Utility for heuristics
     */
+
+    // Determine if state is goal
+    bool isGoal(const State &state, const State &goal);
 
     // G score of a given state
     float dg(const State &state1, const State &state2);
@@ -89,11 +96,17 @@ namespace sbmpo {
         int grid_size;
     };
 
+    struct ControlInfo {
+        std::string name;
+        double range[2];
+    };
+
     typedef std::vector<StateInfo> StateInfoList;
+    typedef std::vector<ControlInfo> ControlInfoList;
 
-    void configure(StateInfoList &states, GridSize &grid_size, GridResolution &grid_resolution);
+    void configure(StateInfoList &states, ControlInfoList &controls, GridSize &grid_size, GridResolution &grid_resolution);
 
-    Node generateStartingNode(const StateInfoList &states);
+    Node generateStartingNode(const StateInfoList &states, const ControlInfoList &controls);
 
 }
 
