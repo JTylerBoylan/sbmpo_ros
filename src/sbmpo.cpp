@@ -1,7 +1,6 @@
 #include <sbmpo_ros/sbmpo.hpp>
 
 namespace sbmpo {
-    
 
     void run(Planner &planner) {
 
@@ -17,6 +16,7 @@ namespace sbmpo {
         int &best = planner.results.best;
         int &high = planner.results.high;
 
+        // Begin iterations
         for (int iter = 0; iter < options.max_iterations; iter++) {
 
             // Get best node from buffer
@@ -31,10 +31,7 @@ namespace sbmpo {
                 break;
 
             // Run sampling
-            for (int n = 0; n < options.sample_size; n++) {
-                // TODO Sampling
-                // Update Vertex methods from thesis
-            }
+            sample(planner, node);
 
             // Update highest node
             high += options.sample_size;
@@ -56,6 +53,12 @@ namespace sbmpo {
         for (int i = best; i != -1; i = buffer[i].parent_id)
             path.push_back(i);
         std::reverse(path.begin(), path.end());
+
+    }
+
+    int sample(const Planner &planner, const Node &node) {
+
+        
 
     }
 

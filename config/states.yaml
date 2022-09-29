@@ -10,8 +10,13 @@ states:
       resolution: 1.0
       size: 141
     control:
-      type: 'cosine'
-      parameter: 'V'
+      - add :
+        - 'X'
+        - multiply:
+          - cosine: 
+            - 'W'
+          - 'V'
+          - 'sample_time_increment'
   - 'Y':
     value:
       initial: 20.0
@@ -23,8 +28,13 @@ states:
       resolution: 1.0
       size: 141
     control:
-      type: 'sine'
-      parameter: 'V'
+      - add:
+        - 'Y'
+        - multiply:
+          - sine: 
+            - 'W'
+          - 'V'
+          - 'sample_time_increment'
   - 'W':
     value:
       initial: 3.9270
@@ -36,8 +46,11 @@ states:
       resolution: 0.26180
       size: 24
     control:
-      type: 'addition'
-      parameter: 'U'
+      - add:
+        - 'W'
+        - multiply:
+          - 'U'
+          - 'sample_time_increment'
 
 controls:
   - 'V':

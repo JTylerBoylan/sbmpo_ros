@@ -1,4 +1,11 @@
 max_iterations: 100000
-max_generations: 100000
+max_generations: 1000
 sample_size: 3
-sample_type: "halton" # 'halton', 'random', or 'input'
+sample_type: 'halton' # 'halton', 'random', or 'input'
+samples: [  # Only if type is 'input', dim: [sample_size x num_controls]
+  [0.75, -0.0524],
+  [1.0, 0.0],
+  [0.75, 0.0524]
+]
+sample_time: 10.0
+sample_time_increment: 1.0
