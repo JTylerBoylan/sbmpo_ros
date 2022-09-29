@@ -56,6 +56,8 @@ namespace sbmpo {
             planner.options.state_info.push_back(state_info);
         }
 
+        ROS_INFO("Configuring Controls");
+
         for (int c = 0; c < control_list.size(); c++) {
             XmlRpc::XmlRpcValue control = control_list[c];
             ControlInfo control_info;
@@ -73,6 +75,9 @@ namespace sbmpo {
             planner.options.control_info.push_back(control_info);
         }
 
+        ROS_INFO("Initializing Planner");
+
+        initialize(planner);
 
     }
 

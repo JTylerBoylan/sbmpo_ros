@@ -56,7 +56,7 @@ namespace sbmpo {
 
     }
 
-    int sample(const Planner &planner, const Node &node) {
+    void sample(const Planner &planner, const Node &node) {
         for (int n = 0; n < planner.options.sample_size; n++) {
 
             // Get child node
@@ -66,23 +66,19 @@ namespace sbmpo {
             child.parent_id = node.id;
             child.generation = node.generation + 1;
             
-            SampleType sample_type = planner.options.sample_type;
+            Control control = generateSamples(planner.options, index, n);
 
-            Control control;
-            if (sample_type == SampleType::INPUT)
-                control = planner.options.sample_list[n];
-            else if (sample_type == SampleType::RANDOM)
-                control = generateRandomSamples(planner.options.control_info.size());
-            else if (sample_type == SampleType::HALTON)
-                control = generateHaltonSamples(planner.options.control_info.size(), planner.results.high);
+            evaluate(child, control, planner);
 
-            evaluate(child, control);
-
-            calculateG(child, node);
+            calculateG(child, node, planner);
 
             calculateH(child, planner);
 
             // TODO
+
+            // Check implicit grid
+
+            // Add to queue
 
         }
     }

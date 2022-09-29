@@ -50,6 +50,9 @@ namespace sbmpo {
     // Determine if rand() has been seeded
     static bool seeded_rand = false;
 
+    // General form of generate samples
+    Control generateSamples(const PlannerOptions &options, const int index, const int n);
+
     /*
         Implicit Grid Functions
     */
@@ -72,7 +75,7 @@ namespace sbmpo {
     */
 
     // Initialize the planner with given options
-    void initialize(Planner &planner, const PlannerOptions &options);
+    void initialize(Planner &planner);
 
     // Reset planner
     void reset(Planner &planner);

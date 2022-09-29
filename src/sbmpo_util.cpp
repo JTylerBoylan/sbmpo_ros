@@ -93,6 +93,30 @@ namespace sbmpo {
         return samples;
     }
 
+    Control generateSamples(const PlannerOptions &options, const int index, const int n) {
+
+        SampleType sample_type = options.sample_type;
+        const int control_size = options.control_info.size();
+        Control control;
+
+        if (sample_type == SampleType::INPUT)
+            return options.sample_list[n];
+        else if (sample_type == SampleType::RANDOM) {
+            control = generateRandomSamples(control_size);
+        } else if (sample_type == SampleType::HALTON) {
+            control = generateHaltonSamples(control_size, index);
+        }
+
+        for (int i = 0; i < control_size; i++) {
+            const float lower_bound = options.control_info[i].range[0];
+            const float upper_bound = options.control_info[i].range[0];
+            control[i] *= upper_bound - lower_bound;
+            control[i] += lower_bound;
+        }
+        
+        return control;
+    }
+
 
     /*
         Implicit Grid Functions
@@ -134,11 +158,10 @@ namespace sbmpo {
         Planner Control Functions
     */
 
-    void initialize(Planner &planner, const PlannerOptions &options) {
-        planner.options = options;
-        planner.buffer_size = options.max_iterations*options.sample_size + 1;
+    void initialize(Planner &planner) {
+        planner.buffer_size = planner.options.max_iterations*planner.options.sample_size + 1;
         initializeBuffer(planner.buffer, planner.buffer_size);
-        initializeGrid(planner.grid, options);
+        initializeGrid(planner.grid, planner.options);
         initializeQueue(planner.queue, planner.buffer);
         planner.results.best = 0;
         planner.results.high = 0;

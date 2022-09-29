@@ -6,10 +6,10 @@
 namespace sbmpo {
 
     // Evaluate a node with a control
-    void evaluate(Node &node, const Control &control);
+    void evaluate(Node &node, const Control &control, const Planner &planner);
 
     // G score of a given state
-    void calculateG(Node &node, const Node &parent);
+    void calculateG(Node &node, const Node &parent, const Planner &planner);
 
     // H score of a given state
     void calculateH(Node &node, const Planner &planner);
