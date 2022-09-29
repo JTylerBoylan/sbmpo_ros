@@ -10,6 +10,9 @@ namespace sbmpo {
     // Configure a planner using a node handle's parameters
     void configure(Planner &planner, const ros::NodeHandle handle);
 
+    // Generate samples
+    void generateSampleList(SampleList &sample_list, const XmlRpc::XmlRpcValue &samples);
+
 }
 
 #endif

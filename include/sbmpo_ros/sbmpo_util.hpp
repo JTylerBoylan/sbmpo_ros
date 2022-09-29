@@ -5,7 +5,7 @@
 
 #include <sbmpo_ros/sbmpo_types.hpp>
 #include <math.h>
-#include <rand.h>
+#include <stdlib.h>
 #include <time.h>
 
 namespace sbmpo {

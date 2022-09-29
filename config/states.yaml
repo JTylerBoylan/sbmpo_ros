@@ -1,5 +1,5 @@
 states:
-  - 'X':
+  - name: 'X'
     value:
       initial: 122.0
       goal: [65.0]
@@ -10,14 +10,14 @@ states:
       resolution: 1.0
       size: 141
     control:
-      - add :
+      - add:
         - 'X'
         - multiply:
           - cosine: 
             - 'W'
           - 'V'
           - 'sample_time_increment'
-  - 'Y':
+  - name: 'Y'
     value:
       initial: 20.0
       goal: [65.0]
@@ -35,7 +35,7 @@ states:
             - 'W'
           - 'V'
           - 'sample_time_increment'
-  - 'W':
+  - name: 'W'
     value:
       initial: 3.9270
       goal: [-1]
@@ -53,11 +53,11 @@ states:
           - 'sample_time_increment'
 
 controls:
-  - 'V':
+  - name: 'V'
     value:
       initial: 0.0
       range: [0.0, 1.0]
-  - 'U':
+  - name: 'U'
     value:
       initial: 0.0
       range: [-0.105, 0.105]

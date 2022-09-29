@@ -64,10 +64,12 @@ namespace sbmpo {
 
     float dg(const Node &node1, const Node &node2) {
         // TODO
+        return 0.0;
     }
 
     float h(const Node &node) {
         // TODO
+        return 0.0;
     }
 
 

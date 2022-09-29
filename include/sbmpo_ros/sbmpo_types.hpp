@@ -5,6 +5,7 @@
 #include <queue>
 #include <array>
 #include <functional>
+#include <algorithm>
 
 namespace sbmpo {
 
@@ -75,6 +76,9 @@ namespace sbmpo {
         Range range;
     };
 
+    // Types for sample storage
+    typedef std::vector<std::vector<float>> SampleList;
+
     // Types for lists of states and controls
     typedef std::vector<StateInfo> StateInfoList;
     typedef std::vector<ControlInfo> ControlInfoList;
@@ -84,7 +88,8 @@ namespace sbmpo {
         int max_iterations;
         int max_generations;
         int sample_size;
-        int max_size;
+        std::string sample_type;
+        SampleList sample_list; // Only used if sample type is 'input'
         StateInfoList state_info;
         ControlInfoList control_info;
     };

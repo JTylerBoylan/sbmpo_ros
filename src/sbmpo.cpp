@@ -57,9 +57,7 @@ namespace sbmpo {
     }
 
     int sample(const Planner &planner, const Node &node) {
-
-        
-
+        return -1;
     }
 
 }

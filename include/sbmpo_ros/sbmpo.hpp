@@ -2,7 +2,6 @@
 #define SBMPO_HPP
 
 #include <sbmpo_ros/sbmpo_util.hpp>
-#include <grid_map_core/GridMap.hpp>
 
 namespace sbmpo {;
 
