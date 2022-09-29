@@ -9,10 +9,10 @@ namespace sbmpo {
         reset(planner);
 
         // Planner components
-        const PlannerOptions options = planner.options;
-        NodeBuffer buffer = planner.buffer;
-        ImplicitGrid grid = planner.grid;
-        NodeQueue queue = planner.queue;
+        const PlannerOptions &options = planner.options;
+        NodeBuffer &buffer = planner.buffer;
+        ImplicitGrid &grid = planner.grid;
+        NodeQueue &queue = planner.queue;
 
         int &best = planner.results.best;
         int &high = planner.results.high;
@@ -23,7 +23,7 @@ namespace sbmpo {
             Node node = buffer[best];
 
             // Goal check
-            if (isGoal(node.state, options.goal))
+            if (isGoal(node.state, options.state_info))
                 break;
 
             // Generation check
@@ -40,20 +40,19 @@ namespace sbmpo {
             high += options.sample_size;
 
             // Check if queue is empty
-            if (queue->empty())
+            if (queue.empty())
                 break;
 
             // Get next best node
-            best = queue->top();
+            best = queue.top();
             
             // Remove from queue
-            queue->pop();
+            queue.pop();
 
         }
 
         // Generate best path (& reverse)
         Path &path = planner.results.path;
-        path.clear();
         for (int i = best; i != -1; i = buffer[i].parent_id)
             path.push_back(i);
         std::reverse(path.begin(), path.end());

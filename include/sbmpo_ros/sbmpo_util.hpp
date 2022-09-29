@@ -11,17 +11,33 @@
 namespace sbmpo {
 
     /*
+        Initialization functions
+    */
+
+    // Initialize the node buffer with given options
+    void initializeBuffer(NodeBuffer &buffer, const size_t size);
+
+    // Initialize the implict grid with given options
+    void initializeGrid(ImplicitGrid &grid, const PlannerOptions &options);
+
+    // Initialize the node queue with a given buffer
+    void initializeQueue(NodeQueue &queue, NodeBuffer &buffer);
+
+    /*
         Heuristics Functions
     */
 
+    // Generate the starting
+    Node startingNode(const PlannerOptions &options);
+
     // Determine if state is goal
-    bool isGoal(const State &state, const State &goal);
+    bool isGoal(const State &state, const StateInfoList &info_list);
 
     // G score of a given state
-    float dg(const State &state1, const State &state2);
+    float dg(const Node &node1, const Node &node2);
 
     // H score of a given state
-    float h(const State &state);
+    float h(const Node &node);
 
 
     /*
@@ -32,7 +48,7 @@ namespace sbmpo {
     const int primes[HALTON_MAX_DIMENSIONS] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29}; 
 
     // Generate Halton samples
-    Control generateHaltonSamples(const unsigned int i, const int n);
+    Control generateHaltonSamples(const int n, const unsigned int seed = 123);
 
     // Generate random samples
     Control generateRandomSamples(const int n, const unsigned int seed = time(NULL));
@@ -46,16 +62,16 @@ namespace sbmpo {
     */
 
     // Convert state position to implicit grid key
-    void toGridKey(const State &state, const GridResolution &resolution, GridKey &key);
+    void toGridKey(GridKey &key, const State &state, const ImplicitGrid &grid);
 
     // Convert implicit grid key to buffer index
-    int toGridIndex(const GridKey &key, const GridSize &grid_size);
+    Index toGridIndex(const GridKey &key, const ImplicitGrid &grid);
 
     // Convert state position directly to node buffer index
-    int toNodeIndex(const State &state, const ImplicitGrid &grid);
+    Index toNodeIndex(const State &state, const ImplicitGrid &grid);
 
     // Get total grid size
-    int getTotalGridSize(const GridSize &grid_size);
+    size_t totalGridSize(const GridSize &grid_size);
 
 
     /*
@@ -68,8 +84,8 @@ namespace sbmpo {
     // Reset planner
     void reset(Planner &planner);
 
-    // Generate the starting
-    Node generateStartingNode(const PlannerOptions &options);
+    // Delete buffers
+    void deconstruct(Planner &planner);
 
 }
 
