@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include <ros/ros.h>
-
 namespace sbmpo {
 
     /*
@@ -21,9 +19,6 @@ namespace sbmpo {
 
     // Initialize the implict grid with given options
     void initializeGrid(ImplicitGrid &grid, const PlannerOptions &options);
-
-    // Initialize the node queue with a given buffer
-    void initializeQueue(NodeQueue &queue, NodeBuffer &buffer);
 
     /*
         Node Functions
@@ -65,8 +60,8 @@ namespace sbmpo {
     // Convert implicit grid key to buffer index
     Index toGridIndex(const GridKey &key, const ImplicitGrid &grid);
 
-    // Convert state position directly to node buffer index
-    Index toNodeIndex(const State &state, const ImplicitGrid &grid);
+    // Convert node to grid index directly
+    Index& toNodeIndex(const Node &node, const ImplicitGrid &grid);
 
     // Get total grid size
     size_t totalGridSize(const GridSize &grid_size);

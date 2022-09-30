@@ -103,21 +103,24 @@ namespace sbmpo {
         for (float t = 0; t < sample_time; t += sample_time_increment) {
 
             // New yaw
-            w += u * sample_time_increment;
+            const float nw = w + u * sample_time_increment;
 
             // New position
-            x += cosf(w) * v * sample_time_increment;
-            y += sinf(w) * v * sample_time_increment;
+            const float nx = x + cosf(nw) * v * sample_time_increment;
+            const float ny = y + sinf(nw) * v * sample_time_increment;
 
             // Bounds check
-            position = grid_map::Position(x,y);
+            position = grid_map::Position(nx,ny);
             if (!(map->isInside(position)))
-                return 0; // return invalid response
+                return false; // return invalid response
+
+            // Update positions if valid
+            w = nw; x = nx; y = ny;
         }
 
         // Yaw angle wrapping, w = (-pi, pi]
-        if (w > M_PI || w <= -M_PI)
-            w += w > M_PI ? -2.0*M_PI : 2.0*M_PI;
+        if (w >= 2.0*M_PI || w < 0.0f)
+            w += w < 0.0f ? 2.0*M_PI : -2.0*M_PI;
 
         // Get elevation data from map
         const float z0 = map->atPosition("elevation", position0);

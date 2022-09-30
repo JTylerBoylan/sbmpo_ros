@@ -50,7 +50,7 @@ namespace sbmpo {
                 } else if (section == "value") {
                     parseStateValue(param->second, state_info);
                 } else if (section == "implicit_grid") {
-                    parseStateGrid(param->second, planner.grid);
+                    parseStateGrid(param->second, state_info);
                 } else {
                     ROS_ERROR("Unknown state parameter: %s", section.c_str());
                 }
@@ -127,18 +127,18 @@ namespace sbmpo {
         }
     }
 
-    void parseStateGrid(const XmlRpc::XmlRpcValue &value, ImplicitGrid &grid) {
+    void parseStateGrid(const XmlRpc::XmlRpcValue &value, StateInfo &info) {
         for (auto param = value.begin(); param != value.end(); ++param) {
             std::string name = param->first;
             if (name == "active") {
-                grid.active.push_back(bool(param->second));
-                ROS_INFO("  Gridded: %s", grid.active.back() ? "true" : "false");
+                info.grid = bool(param->second);
+                ROS_INFO("  Gridded: %s", info.grid ? "true" : "false");
             } else if (name == "resolution") {
-                grid.resolution.push_back(float(double(param->second)));
-                ROS_INFO("  Grid resolution: %.2f", grid.resolution.back());
+                info.grid_resolution = float(double(param->second));
+                ROS_INFO("  Grid resolution: %.2f", info.grid_resolution);
             } else if (name == "size") {
-                grid.size.push_back(int(param->second));
-                ROS_INFO("  Grid size: %i", grid.size.back());
+                info.grid_size = int(param->second);
+                ROS_INFO("  Grid size: %i", info.grid_size);
             } else {
                 ROS_ERROR("Unknown state implicit_grid parameter: %s", name.c_str());
             }

@@ -8,7 +8,7 @@ namespace sbmpo {;
 
     void run(Planner &planner);
 
-    void sample(Planner &planner, const Node &node);
+    Index sample(Planner &planner, const Node &node, const int n);
 
 }
 

@@ -110,14 +110,13 @@ namespace sbmpo {
     };
 
     // Type for priority queue
-    typedef std::priority_queue<Index, std::vector<Index>, std::function<bool (Index,Index)>> NodeQueue;
+    typedef std::priority_queue<Index, std::vector<Index>, const std::function<bool (Index,Index)>> NodeQueue;
 
     // Struct to hold all planner information
     struct Planner {
         PlannerOptions options;
         NodeBuffer buffer;
         ImplicitGrid grid;
-        NodeQueue queue;
         PlannerResults results;
         size_t buffer_size;
     };

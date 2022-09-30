@@ -23,7 +23,7 @@ namespace sbmpo {
     void parseStateValue(const XmlRpc::XmlRpcValue &value, StateInfo &info);
 
     // Parse state grid section
-    void parseStateGrid(const XmlRpc::XmlRpcValue &value, ImplicitGrid &grid);
+    void parseStateGrid(const XmlRpc::XmlRpcValue &value, StateInfo &info);
 
     // Parse control name
     void parseControlName(const XmlRpc::XmlRpcValue &value, ControlInfo &info);

@@ -11,7 +11,14 @@ namespace sbmpo {
         const PlannerOptions &options = planner.options;
         NodeBuffer &buffer = planner.buffer;
         ImplicitGrid &grid = planner.grid;
-        NodeQueue &queue = planner.queue;
+
+        // Set comparator function
+        const std::function<bool(Index,Index)> comp = [&](Index a, Index b) {
+            return buffer[a].heuristic[0] > buffer[b].heuristic[0];
+        };
+
+        // Create priority queue
+        NodeQueue queue = NodeQueue(comp);
 
         int &best = planner.results.best;
         int &high = planner.results.high;
@@ -19,29 +26,23 @@ namespace sbmpo {
         // Begin iterations
         for (int iter = 0; iter < options.max_iterations; iter++) {
 
-            ROS_INFO("Running iteration %d...", iter);
-
             // Get best node from buffer
             Node node = buffer[best];
-
-            ROS_INFO("Checking goal...");
 
             // Goal check
             if (isGoal(node.state, options.state_info))
                 break;
 
-            ROS_INFO("Checking generation...");
-
             // Generation check
             if (node.generation >= options.max_generations)
                 break;
 
-            ROS_INFO("Sampling...");
-
             // Run sampling
-            sample(planner, node);
-
-            ROS_INFO("Continue.");
+            for (int n = 0; n < planner.options.sample_size; n++) {
+                Index response = sample(planner, node, n);
+                if (response != INVALID_INDEX)
+                    queue.push(response);
+            }
 
             // Update highest node
             high += options.sample_size;
@@ -58,8 +59,6 @@ namespace sbmpo {
 
         }
 
-        ROS_INFO("Planner finished.");
-
         // Generate best path (& reverse)
         Path &path = planner.results.path;
         for (int i = best; i != -1; i = buffer[i].parent_id)
@@ -68,54 +67,48 @@ namespace sbmpo {
 
     }
 
-    void sample(Planner &planner, const Node &node) {
+    Index sample(Planner &planner, const Node &node, const int n) {
 
-        // Iterate through samples
-        for (int n = 0; n < planner.options.sample_size; n++) {
+        // Get child node
+        const int index = planner.results.high + n + 1;
+        Node &child = planner.buffer[index];
+        child.id = index;
+        child.parent_id = node.id;
+        child.generation = node.generation + 1;
+        child.state = node.state;
+        child.heuristic = node.heuristic;
 
-            // Get child node
-            const int index = planner.results.high + n + 1;
-            Node &child = planner.buffer[index];
-            child.id = index;
-            child.parent_id = node.id;
-            child.generation = node.generation + 1;
-            
-            // Generate set of controls
-            Control control = generateSamples(planner.options, index, n);
-            child.control = control;
+        // Generate set of controls
+        Control control = generateSamples(planner.options, index, n);
+        child.control = control;
 
-            // Evaluate using external function
-            if (!evaluate(child, planner))
-                continue;
+        // Evaluate using external function
+        if (!evaluate(child, planner))
+            return INVALID_INDEX;
 
-            // Get location on implicit grid
-            GridKey grid_key = toGridKey(child.state, planner.grid);
-            Index grid_index = toGridIndex(grid_key, planner.grid);
-            Index& grid_node_index = planner.grid.buffer[grid_index];
+        // Get location on implicit grid
+        Index& grid_node_index = toNodeIndex(child, planner.grid);
 
-            if (grid_node_index == INVALID_INDEX) {
-                
-                // If there is no node on implicit grid, add child node
-                grid_node_index = child.id;
+        if (grid_node_index != INVALID_INDEX) {
 
-                // Add to priority queue
-                planner.queue.push(child.id);
+            // If there is a node on implicit grid, compare with the child
+            Node &grid_node = planner.buffer[grid_node_index];
 
-            } else {
+            // If the child node has a lower g score than the existing one, replace the existing node
+            if (child.heuristic[1] < grid_node.heuristic[1])
+                grid_node = child;
 
-                // If there is a node on implicit grid, compare with the child
-                Node &grid_node = planner.buffer[grid_node_index];
+            // No need to add node to priority queue because the existing node was already added and
+            // the samples would be identical given they are the same
 
-                // If the child node has a lower g score than the existing one, replace the existing node
-                if (child.heuristic[1] < grid_node.heuristic[1])
-                    grid_node = child;
-
-                // No need to add node to priority queue because the existing node was already added and
-                // the samples would be identical given they are the same
-
-            }
-
+            return INVALID_INDEX;
         }
+
+        // If there is no node on implicit grid, add child node
+        grid_node_index = child.id;
+
+        // Respond with node index
+        return child.id;
     }
 
 }

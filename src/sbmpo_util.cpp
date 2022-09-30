@@ -30,14 +30,6 @@ namespace sbmpo {
         grid.buffer = new Index[grid.max_size];
     }
 
-    void initializeQueue(NodeQueue &queue, NodeBuffer &buffer) {
-        static std::function<bool(Index,Index)> comp = [&](Index a, Index b) {
-            return buffer[a].heuristic[0] > buffer[b].heuristic[0];
-        };
-        queue = NodeQueue(comp);
-    }
-
-
     Node startingNode(const PlannerOptions &options) {
         Node starting_node;
         for (int s = 0; s < options.state_info.size(); s++)
@@ -55,9 +47,10 @@ namespace sbmpo {
         for (int i = 0; i < state.size(); i++) {
             const StateInfo &info = info_list[i];
             const float val = state[i];
-            if (info.defined_goal)
+            if (info.defined_goal) {
                 if (val < info.goal_value[0] || val > info.goal_value[1])
                     return false;
+            }
         }
         return true;
     }
@@ -142,9 +135,10 @@ namespace sbmpo {
         return index;
     }
 
-    Index toNodeIndex(const State &state, const ImplicitGrid &grid) {
-        GridKey key = toGridKey(state, grid);
-        return grid.buffer[toGridIndex(key, grid)];
+    Index& toNodeIndex(const Node &node, const ImplicitGrid &grid) {
+        const GridKey key = toGridKey(node.state, grid);
+        const Index index = toGridIndex(key, grid);
+        return grid.buffer[index];
     }
 
     size_t totalGridSize(const GridSize &grid_size) {
@@ -162,7 +156,6 @@ namespace sbmpo {
         planner.buffer_size = planner.options.max_iterations*planner.options.sample_size + 1;
         initializeBuffer(planner.buffer, planner.buffer_size);
         initializeGrid(planner.grid, planner.options);
-        initializeQueue(planner.queue, planner.buffer);
         planner.results.best = 0;
         planner.results.high = 0;
     }
@@ -172,10 +165,11 @@ namespace sbmpo {
             planner.buffer[idx].id = -1;
         for (Index idx = 0; idx < planner.grid.max_size; idx++)
             planner.grid.buffer[idx] = -1;
-        planner.queue = {};
         planner.results.best = 0;
         planner.results.high = 0;
         planner.results.path.clear();
+        planner.buffer[0] = startingNode(planner.options);
+        toNodeIndex(planner.buffer[0], planner.grid) = 0;
     }
 
     void deconstruct(Planner &planner) {
