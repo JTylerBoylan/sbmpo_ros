@@ -1,8 +1,0 @@
-<launch>
-
-    <rosparam command="load" file="$(find sbmpo_ros)/config/states.yaml" ns="sbmpo"/>
-    <rosparam command="load" file="$(find sbmpo_ros)/config/config.yaml" ns="sbmpo"/>
-
-    <node pkg="sbmpo_ros" type="sbmpo" name="sbmpo" output="screen"/>
-
-</launch>

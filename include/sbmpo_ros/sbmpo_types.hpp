@@ -93,6 +93,8 @@ namespace sbmpo {
         int max_iterations;
         int max_generations;
         int sample_size;
+        float sample_time;
+        float sample_time_increment;
         SampleType sample_type;
         SampleList sample_list; // Only used if sample type is 'input'
         StateInfoList state_info;

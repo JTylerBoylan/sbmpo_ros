@@ -30,3 +30,7 @@ add_library(${PROJECT_NAME}
 add_executable(sbmpo src/ros_node.cpp)
 target_link_libraries(sbmpo ${catkin_LIBRARIES} ${PROJECT_NAME})
 
+catkin_install_python(PROGRAMS scripts/mat2gridmap.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+

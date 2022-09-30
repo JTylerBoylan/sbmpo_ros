@@ -6,10 +6,11 @@
 namespace sbmpo {
 
     // Evaluate a node with a control
-    bool evaluate(Node &node, const Control &control, const Planner &planner);
+    extern bool evaluate(Node &node, const Planner &planner);
 
     // Send external data into sbmpo
-    template<class T> void send_external(T &obj);
+    template<class T> 
+    extern void send_external(T &obj);
 
 }
 

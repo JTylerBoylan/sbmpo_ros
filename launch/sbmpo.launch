@@ -1,0 +1,25 @@
+<launch>
+
+    <rosparam command="load" file="$(find sbmpo_ros)/config/states.yaml" ns="sbmpo"/>
+    <rosparam command="load" file="$(find sbmpo_ros)/config/config.yaml" ns="sbmpo"/>
+
+    <node pkg="sbmpo_ros" type="sbmpo" name="sbmpo" output="screen">
+        <param name="map_topic" value="/map"/>
+        <param name="path_topic" value="/path"/>
+        <param name="poses_topic" value="/poses"/>
+        <param name="publish_all" value="true"/>
+        <param name="publish_rate" value="1"/>
+    </node>
+
+    <node name="mat2gridmap" pkg="sbmpo" type="mat2gridmap.py" output="screen">
+        <param name="publish_topic" value="/map"/>
+        <param name="data_file" value="data/dataforlocalplanner.mat"/>
+        <param name="frame_id" value="map"/>
+        <param name="resolution" value="1.0"/>
+        <param name="length_x" value="141"/>
+        <param name="length_y" value="141"/>
+        <param name="position_x" value="70.0"/>
+        <param name="position_y" value="70.0"/>
+    </node>
+
+</launch>

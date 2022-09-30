@@ -70,9 +70,10 @@ namespace sbmpo {
             
             // Generate set of controls
             Control control = generateSamples(planner.options, index, n);
+            child.control = control;
 
             // Evaluate using external function
-            if (!evaluate(child, control, planner))
+            if (!evaluate(child, planner))
                 continue;
 
             // Get location on implicit grid

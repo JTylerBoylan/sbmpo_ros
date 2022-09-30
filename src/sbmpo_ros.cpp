@@ -27,7 +27,11 @@ namespace sbmpo {
             generateSampleList(planner.options.sample_list, samples);
         }
 
-        std::map<std::string, float*> variable_map;
+        handle.getParam("sample_time", planner.options.sample_time);
+        handle.getParam("sample_time_increment", planner.options.sample_time_increment);
+
+        ROS_INFO("Sample Time: %.2f", planner.options.sample_time);
+        ROS_INFO("Sample Time Increment: %.2f", planner.options.sample_time_increment);
 
         XmlRpc::XmlRpcValue state_list, control_list;
         handle.getParam("states", state_list);
@@ -166,6 +170,55 @@ namespace sbmpo {
                 ROS_ERROR("Unknown control value parameter: %s", name.c_str());
             }
         }
+    }
+
+    void getPath(nav_msgs::Path& path, const Planner &planner, const grid_map::GridMap &map) {
+        for (int i : planner.results.path) {
+            geometry_msgs::PoseStamped pose;
+            pose.header.stamp = ros::Time::now();
+            pose.header.frame_id = map.getFrameId();
+            pose.pose = toPose(planner.buffer[i], map);
+            path.poses.push_back(pose);
+        }
+    }
+
+    void getAllPoses(geometry_msgs::PoseArray &poses, const Planner &planner, const grid_map::GridMap &map) {
+        for (int i = 0; i < planner.results.high; i++)
+            if (planner.buffer[i].id != INVALID_INDEX)
+                poses.poses.push_back(toPose(planner.buffer[i], map));
+    }
+
+    geometry_msgs::Pose toPose(const Node &node, const grid_map::GridMap &map) {
+        const float x = node.state[0];
+        const float y = node.state[1];
+        const float w = node.state[2];
+
+        const grid_map::Position pos(x, y);
+        const float z = map.atPosition("elevation", pos);
+
+        Eigen::Vector3d forward(2.0 * cos(w), 2.0 * sin(w), 0.0);
+        const grid_map::Position fwd(x + forward.x(), y + forward.y());
+        forward.z() = map.isInside(fwd) ? map.atPosition("elevation", fwd) - z : 0.0;
+
+        Eigen::Vector3d lateral(2.0 * cos(w + M_PI_2), 2.0 * sin(w + M_PI_2), 0.0);
+        const grid_map::Position lat(x + lateral.x(), y + lateral.y());
+        lateral.z() = map.isInside(lat) ? map.atPosition("elevation", lat) - z : 0.0;
+
+        Eigen::Vector3d normal = forward.cross(lateral).normalized();
+
+        const double sin_w2 = sin(w / 2.0);
+        const double cos_w2 = cos(w / 2.0);
+
+        geometry_msgs::Pose p;
+        p.position.x = x;
+        p.position.y = y;
+        p.position.z = z;
+        p.orientation.x = normal.x() * sin_w2;
+        p.orientation.y = normal.y() * sin_w2;
+        p.orientation.z = normal.z() * sin_w2;
+        p.orientation.w = cos_w2;
+
+        return p;
     }
 
 }
