@@ -63,7 +63,6 @@ namespace sbmpo {
         std::string name;
         float initial_value;
         Range goal_value;
-        Range range;
         bool defined_goal;
         bool grid;
         float grid_resolution;

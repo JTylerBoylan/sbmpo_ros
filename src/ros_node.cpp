@@ -47,6 +47,8 @@ int main (int argc, char ** argv) {
         if (!map_init)
             continue;
 
+        ROS_INFO("Running planner...");
+
         clock_t cstart, cend;
 
         cstart = clock();

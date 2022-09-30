@@ -109,26 +109,22 @@ namespace sbmpo {
                 info.initial_value = float(double(param->second));
                 ROS_INFO("  Initial value: %.2f", info.initial_value);
             } else if (name == "goal") {
-                Range goal;
-                for (int i = 0; i < param->second.size(); i++)
-                    goal[i] = float(double(param->second[i]));
-                if (param->second.size() < 2)
-                    goal[1] = goal[0];
-                info.goal_value = goal;
-                ROS_INFO("  Goal range: [%.2f %.2f]", goal[0], goal[1]);
-            } else if (name == "range") {
-                Range range;
-                for (int i = 0; i < 2; i++)
-                    range[i] = float(double(param->second[i]));
-                info.range = range;
-                ROS_INFO("  Value range: [%.2f %.2f]", range[0], range[1]);
+                if (param->second.getType() == XmlRpc::XmlRpcValue::TypeBoolean)
+                    info.defined_goal = bool(param->second);
+                else {
+                    Range goal;
+                    for (int i = 0; i < param->second.size(); i++)
+                        goal[i] = float(double(param->second[i]));
+                    if (param->second.size() < 2)
+                        goal[1] = goal[0];
+                    info.goal_value = goal;
+                    ROS_INFO("  Goal range: [%.2f %.2f]", goal[0], goal[1]);
+                }
+                ROS_INFO("  Defined goal: %s", info.defined_goal ? "true" : "false");
             } else {
                 ROS_ERROR("Unknown state value parameter: %s", name.c_str());
             }
         }
-        if (info.goal_value[1] < info.range[0] || info.goal_value[0] > info.range[1])
-            info.defined_goal = false;
-        ROS_INFO("  Defined goal: %s", info.defined_goal ? "true" : "false");
     }
 
     void parseStateGrid(const XmlRpc::XmlRpcValue &value, ImplicitGrid &grid) {

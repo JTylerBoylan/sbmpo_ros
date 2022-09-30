@@ -19,19 +19,29 @@ namespace sbmpo {
         // Begin iterations
         for (int iter = 0; iter < options.max_iterations; iter++) {
 
+            ROS_INFO("Running iteration %d...", iter);
+
             // Get best node from buffer
             Node node = buffer[best];
+
+            ROS_INFO("Checking goal...");
 
             // Goal check
             if (isGoal(node.state, options.state_info))
                 break;
 
+            ROS_INFO("Checking generation...");
+
             // Generation check
             if (node.generation >= options.max_generations)
                 break;
 
+            ROS_INFO("Sampling...");
+
             // Run sampling
             sample(planner, node);
+
+            ROS_INFO("Continue.");
 
             // Update highest node
             high += options.sample_size;
@@ -47,6 +57,8 @@ namespace sbmpo {
             queue.pop();
 
         }
+
+        ROS_INFO("Planner finished.");
 
         // Generate best path (& reverse)
         Path &path = planner.results.path;

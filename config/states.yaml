@@ -3,7 +3,6 @@ states:
     value:
       initial: 122.0
       goal: [65.0]
-      range: [0.0, 141.0]
     implicit_grid:
       active: true
       resolution: 1.0
@@ -13,7 +12,6 @@ states:
     value:
       initial: 20.0
       goal: [65.0]
-      range: [0.0, 141.0]
     implicit_grid:
       active: true
       resolution: 1.0
@@ -22,12 +20,18 @@ states:
   - name: 'W'
     value:
       initial: 3.9270
-      goal: [-1.0]
-      range: [0.0, 6.2832]
+      goal: false
     implicit_grid:
       active: true
       resolution: 0.26180
       size: 24
+
+  - name: 'T'
+    value:
+      initial: 300.0
+      goal: false
+    implicit_grid:
+      active: false
 
 controls:
   - name: 'V'

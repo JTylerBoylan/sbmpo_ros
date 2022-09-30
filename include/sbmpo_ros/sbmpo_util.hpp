@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <ros/ros.h>
+
 namespace sbmpo {
 
     /*
