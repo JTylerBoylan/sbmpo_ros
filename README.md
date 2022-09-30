@@ -22,7 +22,7 @@ git clone https://github.com/JTylerBoylan/sbmpo_ros
 ```
 catkin_make
 source devel/setup.bash
-roslaunch sbmpo_ros planner.launch
+roslaunch sbmpo_ros sbmpo.launch
 ```
 
 ## Parameters
