@@ -47,8 +47,6 @@ namespace sbmpo {
                     parseStateValue(param->second, state_info);
                 } else if (section == "implicit_grid") {
                     parseStateGrid(param->second, planner.grid);
-                } else if (section == "control") {
-                    parseStateControl(param->second, state_info);
                 } else {
                     ROS_ERROR("Unknown state parameter: %s", section.c_str());
                 }
@@ -120,10 +118,6 @@ namespace sbmpo {
                     range[i] = float(double(param->second[i]));
                 info.range = range;
                 ROS_INFO("  Value range: [%.2f %.2f]", range[0], range[1]);
-            } else if (name == "overflow") {
-                std::string overflow_type = std::string(param->second);
-                info.overflow = toOverflowType(overflow_type);
-                ROS_INFO("  Overflow type: %s (%i)", overflow_type.c_str(), info.overflow);
             } else {
                 ROS_ERROR("Unknown state value parameter: %s", name.c_str());
             }
@@ -149,10 +143,6 @@ namespace sbmpo {
                 ROS_ERROR("Unknown state implicit_grid parameter: %s", name.c_str());
             }
         }
-    }
-
-    void parseStateControl(const XmlRpc::XmlRpcValue &control, StateInfo &info) {
-
     }
 
     void parseControlName(const XmlRpc::XmlRpcValue &value, ControlInfo &info) {

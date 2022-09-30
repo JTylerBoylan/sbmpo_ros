@@ -58,7 +58,7 @@ namespace sbmpo {
     */
 
     // Convert state position to implicit grid key
-    void toGridKey(GridKey &key, const State &state, const ImplicitGrid &grid);
+    GridKey toGridKey(const State &state, const ImplicitGrid &grid);
 
     // Convert implicit grid key to buffer index
     Index toGridIndex(const GridKey &key, const ImplicitGrid &grid);
@@ -89,9 +89,6 @@ namespace sbmpo {
 
     // Convert string to sample type
     SampleType toSampleType(const std::string &type);
-
-    // Convert string to overflow type
-    OverflowType toOverflowType(const std::string &type);
 
 }
 

@@ -7,6 +7,8 @@
 #include <functional>
 #include <algorithm>
 
+#define INVALID_INDEX -1
+
 namespace sbmpo {
 
     // State: n-dimensional array of state positions
@@ -53,9 +55,6 @@ namespace sbmpo {
     // Type to indicate array is a range
     typedef std::array<float, 2> Range;
 
-    // Enum to hold overflow types
-    enum OverflowType {BREAK, WRAP};
-
     // Type to hold pointer to control equation
     typedef float (*ControlEquation)(float*, float*);
 
@@ -65,7 +64,6 @@ namespace sbmpo {
         float initial_value;
         Range goal_value;
         Range range;
-        OverflowType overflow;
         bool defined_goal;
         bool grid;
         float grid_resolution;
@@ -111,7 +109,7 @@ namespace sbmpo {
     };
 
     // Type for priority queue
-    typedef std::priority_queue<int, std::vector<Index>, std::function<bool (int,int)>> NodeQueue;
+    typedef std::priority_queue<Index, std::vector<Index>, std::function<bool (Index,Index)>> NodeQueue;
 
     // Struct to hold all planner information
     struct Planner {

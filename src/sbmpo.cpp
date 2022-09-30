@@ -56,7 +56,9 @@ namespace sbmpo {
 
     }
 
-    void sample(const Planner &planner, const Node &node) {
+    void sample(Planner &planner, const Node &node) {
+
+        // Iterate through samples
         for (int n = 0; n < planner.options.sample_size; n++) {
 
             // Get child node
@@ -66,19 +68,39 @@ namespace sbmpo {
             child.parent_id = node.id;
             child.generation = node.generation + 1;
             
+            // Generate set of controls
             Control control = generateSamples(planner.options, index, n);
 
-            evaluate(child, control, planner);
+            // Evaluate using external function
+            if (!evaluate(child, control, planner))
+                continue;
 
-            calculateG(child, node, planner);
+            // Get location on implicit grid
+            GridKey grid_key = toGridKey(child.state, planner.grid);
+            Index grid_index = toGridIndex(grid_key, planner.grid);
+            Index& grid_node_index = planner.grid.buffer[grid_index];
 
-            calculateH(child, planner);
+            if (grid_node_index == INVALID_INDEX) {
+                
+                // If there is no node on implicit grid, add child node
+                grid_node_index = child.id;
 
-            // TODO
+                // Add to priority queue
+                planner.queue.push(child.id);
 
-            // Check implicit grid
+            } else {
 
-            // Add to queue
+                // If there is a node on implicit grid, compare with the child
+                Node &grid_node = planner.buffer[grid_node_index];
+
+                // If the child node has a lower g score than the existing one, replace the existing node
+                if (child.heuristic[1] < grid_node.heuristic[1])
+                    grid_node = child;
+
+                // No need to add node to priority queue because the existing node was already added and
+                // the samples would be identical given they are the same
+
+            }
 
         }
     }

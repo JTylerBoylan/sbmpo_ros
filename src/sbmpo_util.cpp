@@ -31,7 +31,7 @@ namespace sbmpo {
     }
 
     void initializeQueue(NodeQueue &queue, NodeBuffer &buffer) {
-        const std::function<bool(int,int)> comp = [&](int a, int b) {
+        static std::function<bool(Index,Index)> comp = [&](Index a, Index b) {
             return buffer[a].heuristic[0] > buffer[b].heuristic[0];
         };
         queue = NodeQueue(comp);
@@ -122,12 +122,13 @@ namespace sbmpo {
         Implicit Grid Functions
     */
 
-    void toGridKey(GridKey &key, const State &state, const ImplicitGrid &grid) {
-        key.clear();
+    GridKey toGridKey(const State &state, const ImplicitGrid &grid) {
+        GridKey key;
         const GridResolution &resolution = grid.resolution;
         for (int i = 0; i < state.size(); i++)
             if (grid.active[i])
                 key.push_back(int(state[i]/resolution[i]));
+        return key;
     }
 
     Index toGridIndex(const GridKey &key, const ImplicitGrid &grid) {
@@ -142,8 +143,7 @@ namespace sbmpo {
     }
 
     Index toNodeIndex(const State &state, const ImplicitGrid &grid) {
-        GridKey key;
-        toGridKey(key, state, grid);
+        GridKey key = toGridKey(state, grid);
         return grid.buffer[toGridIndex(key, grid)];
     }
 
@@ -195,14 +195,6 @@ namespace sbmpo {
         if (type == "halton")
             return SampleType::HALTON;
         return SampleType::INPUT;
-    }
-
-    OverflowType toOverflowType(const std::string &type) {
-        if (type == "break")
-            return OverflowType::BREAK;
-        if (type == "wrap")
-            return OverflowType::WRAP;
-        return OverflowType::BREAK;
     }
 
 }

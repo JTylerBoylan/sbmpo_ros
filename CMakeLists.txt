@@ -24,6 +24,7 @@ add_library(${PROJECT_NAME}
   src/sbmpo_util.cpp
   src/sbmpo.cpp
   src/sbmpo_ros.cpp
+  src/sbmpo_extern.cpp
 )
 
 add_executable(sbmpo src/ros_node.cpp)

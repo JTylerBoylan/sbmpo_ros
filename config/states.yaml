@@ -4,7 +4,6 @@ states:
       initial: 122.0
       goal: [65.0]
       range: [0.0, 141.0]
-      overflow: 'break'
     implicit_grid:
       active: true
       resolution: 1.0
@@ -15,7 +14,6 @@ states:
       initial: 20.0
       goal: [65.0]
       range: [0.0, 141.0]
-      overflow: 'break'
     implicit_grid:
       active: true
       resolution: 1.0
@@ -26,7 +24,6 @@ states:
       initial: 3.9270
       goal: [-1.0]
       range: [0.0, 6.2832]
-      overflow: 'wrap'
     implicit_grid:
       active: true
       resolution: 0.26180
