@@ -80,8 +80,8 @@ namespace sbmpo {
         const float v0 = parent.control[0];
         const float u0 = parent.control[1];
 
-        const float gx = planner.options.state_info[0].goal_value[0];
-        const float gy = planner.options.state_info[0].goal_value[1];
+        const float gx = planner.options.state_info[0].goal_avg;
+        const float gy = planner.options.state_info[1].goal_avg;
 
         const float v = node.control[0];
         const float u = node.control[1];

@@ -119,6 +119,8 @@ namespace sbmpo {
                         goal[1] = goal[0];
                     info.goal_value = goal;
                     ROS_INFO("  Goal range: [%.2f %.2f]", goal[0], goal[1]);
+                    info.goal_avg = (goal[0] + goal[1]) / 2.0f;
+                    ROS_INFO("  Goal average: %.2f", info.goal_avg);
                 }
                 ROS_INFO("  Defined goal: %s", info.defined_goal ? "true" : "false");
             } else {
@@ -192,11 +194,11 @@ namespace sbmpo {
         const grid_map::Position pos(x, y);
         const float z = map.atPosition("elevation", pos);
 
-        Eigen::Vector3d forward(2.0 * cos(w), 2.0 * sin(w), 0.0);
+        Eigen::Vector3d forward(cos(w), sin(w), 0.0);
         const grid_map::Position fwd(x + forward.x(), y + forward.y());
         forward.z() = map.isInside(fwd) ? map.atPosition("elevation", fwd) - z : 0.0;
 
-        Eigen::Vector3d lateral(2.0 * cos(w + M_PI_2), 2.0 * sin(w + M_PI_2), 0.0);
+        Eigen::Vector3d lateral(cos(w + M_PI_2), sin(w + M_PI_2), 0.0);
         const grid_map::Position lat(x + lateral.x(), y + lateral.y());
         lateral.z() = map.isInside(lat) ? map.atPosition("elevation", lat) - z : 0.0;
 

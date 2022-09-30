@@ -22,4 +22,6 @@
         <param name="position_y" value="70.0"/>
     </node>
 
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find sbmpo_ros)/config/map.rviz" />
+
 </launch>

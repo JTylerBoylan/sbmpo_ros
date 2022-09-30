@@ -2,7 +2,7 @@ states:
   - name: 'X'
     value:
       initial: 122.0
-      goal: [65.0]
+      goal: [62.5, 67.5]
     implicit_grid:
       active: true
       resolution: 1.0
@@ -10,8 +10,8 @@ states:
 
   - name: 'Y'
     value:
-      initial: 20.0
-      goal: [65.0]
+      initial: 122.0
+      goal: [62.5, 67.5]
     implicit_grid:
       active: true
       resolution: 1.0
