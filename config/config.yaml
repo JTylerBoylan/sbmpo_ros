@@ -1,5 +1,5 @@
-max_iterations: 100000
-max_generations: 1000
+max_iterations: 10000
+max_generations: 25
 
 sample_size: 3
 sample_time: 10.0

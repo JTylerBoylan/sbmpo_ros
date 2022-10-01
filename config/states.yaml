@@ -23,8 +23,8 @@ states:
       goal: false
     implicit_grid:
       active: true
-      resolution: 0.26180
-      size: 24
+      resolution: 0.31416
+      size: 20
 
   - name: 'T'
     value:
