@@ -79,12 +79,6 @@ namespace sbmpo {
         Range range;
     };
 
-    // Enum to hold different sampling types
-    enum SampleType {INPUT, RANDOM, HALTON};
-
-    // Types for sample storage
-    typedef std::vector<Control> SampleList;
-
     // Types for lists of states and controls
     typedef std::vector<StateInfo> StateInfoList;
     typedef std::vector<ControlInfo> ControlInfoList;
@@ -96,8 +90,6 @@ namespace sbmpo {
         int sample_size;
         float sample_time;
         float sample_time_increment;
-        SampleType sample_type;
-        SampleList sample_list; // Only used if sample type is 'input'
         StateInfoList state_info;
         ControlInfoList control_info;
     };

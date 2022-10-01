@@ -7,37 +7,49 @@ namespace sbmpo {
 
     // Parameters
 
-    float max_velocity = 1.0f;
-    float max_rotation = M_PI / 60.0;
+    const float max_velocity = 1.0f;
+    const float max_rotation = M_PI / 60.0;
 
-    float body_mass = 10.0f; // kg
-    float body_moment = 100.0f; // kg m^2
+    const float body_mass = 10.0f; // kg
+    const float body_moment = 100.0f; // kg m^2
 
-    float drag_force = 10.0f; // J/m
+    const float drag_force = 10.0f; // J/m
 
-    float forward_factor = 1.0;
-    float reverse_factor = 2.0;
+    const float forward_factor = 1.0;
+    const float reverse_factor = 2.0;
 
-    float gravity_force = 10.0f; // J/m
+    const float gravity_force = 10.0f; // J/m
 
-    float uphill_factor = 1.0f;
-    float downhill_factor = 0.25f;
+    const float uphill_factor = 1.0f;
+    const float downhill_factor = 0.25f;
 
-    float acceleration_factor = 1.0f;
-    float decceleration_factor = 0.25f;
-    float rotational_factor = 1.0f;
+    const float acceleration_factor = 1.0f;
+    const float decceleration_factor = 0.25f;
+    const float rotational_factor = 1.0f;
 
-    float heat_transfer = 5e-10f;
+    const float heat_transfer = 5e-10f;
 
-    float hot_factor = 0.0f;
-    float cool_factor = 100.0f;
+    const float hot_factor = 0.0f;
+    const float cool_factor = 100.0f;
 
-    float desired_temperature = 300.0f;
-    float initial_temperature = 350.0f;
+    const float desired_temperature = 300.0f;
+    const float initial_temperature = 350.0f;
 
-    float map2temp_a = -520.0f;
-    float map2temp_b = 26.0f;
-    float map2temp_c = 400.0f;
+    const float map2temp_a = -520.0f;
+    const float map2temp_b = 26.0f;
+    const float map2temp_c = 400.0f;
+
+    const Control controls[3] = {
+        {0.75f, -0.0524f},
+        {1.0f, 0.0f},
+        {0.75f, 0.0524f}
+    };
+
+    // Generate Halton samples
+    Control generateHaltonSamples(const int n, const unsigned int seed, const ControlInfoList &info);
+
+    // Generate random samples
+    Control generateRandomSamples(const int n, const unsigned int seed, const ControlInfoList &info);
 
     // G-score increment for a given sample
     float dg(const float dt, const float v, const float u, const float dv, const float du, 
@@ -73,7 +85,7 @@ namespace sbmpo {
         return dg(dt, max_velocity, max_rotation, 0.0f, 0.0f, dz, desired_temperature);
     }
 
-    bool evaluate(Node &node, const Planner &planner) {
+    bool evaluate(Node &node, const Planner &planner, const int n) {
 
         const Node& parent = planner.buffer[node.parent_id];
 
@@ -83,8 +95,13 @@ namespace sbmpo {
         const float gx = planner.options.state_info[0].goal_avg;
         const float gy = planner.options.state_info[1].goal_avg;
 
-        const float v = node.control[0];
-        const float u = node.control[1];
+        // Generate set of controls
+        Control control = controls[n];
+        //Control control = generateRandomSamples(node.control.size(), node.id, planner.options.control_info);
+        //Control control = generateHaltonSamples(node.control.size(), node.id, planner.options.control_info);
+        node.control = control;
+        const float v = control[0];
+        const float u = control[1];
 
         const float sample_time = planner.options.sample_time;
         const float sample_time_increment = planner.options.sample_time_increment;
@@ -149,5 +166,48 @@ namespace sbmpo {
     }
 
     template void send_external<grid_map::GridMap>(grid_map::GridMap &obj);
+
+        /*
+        Sample Generation Functions
+    */
+
+    // Stores primes used in Halton sampling
+    static const int primes[10] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29}; 
+    Control generateHaltonSamples(const int n, const unsigned int seed, const ControlInfoList &info) {
+        Control control;
+        double x;
+        int k, p, num;
+        for (int j = 0; j < n; j++) {
+            x = 0.0, k = 1, p = primes[j], num = seed;
+            while (num > 0) {
+                x += double(num % p) / pow(p, k++);
+                num /= p;
+            }
+            const float lower_bound = info[j].range[0];
+            const float upper_bound = info[j].range[1];
+            x *= upper_bound - lower_bound;
+            x += lower_bound;
+            control.push_back(x);
+        }
+        return control;
+    }
+
+    static bool seeded_rand = false;
+    Control generateRandomSamples(const int n, const unsigned int seed, const ControlInfoList &info) {
+        if (!seeded_rand) {
+            srand(seed);
+            seeded_rand = true;
+        }
+        Control samples;
+        for (int j = 0; j < n; j++) {
+            float x = double(rand()) / RAND_MAX;
+            const float lower_bound = info[j].range[0];
+            const float upper_bound = info[j].range[1];
+            x *= upper_bound - lower_bound;
+            x += lower_bound;
+            samples.push_back(x);
+        }
+        return samples;
+    }
 
 }

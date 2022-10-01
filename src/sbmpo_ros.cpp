@@ -2,6 +2,22 @@
 
 namespace sbmpo {
 
+    // Parse state name
+    void parseStateName(const XmlRpc::XmlRpcValue &value, StateInfo &info);
+
+    // Parse state value section
+    void parseStateValue(const XmlRpc::XmlRpcValue &value, StateInfo &info);
+
+    // Parse state grid section
+    void parseStateGrid(const XmlRpc::XmlRpcValue &value, StateInfo &info);
+
+    // Parse control name
+    void parseControlName(const XmlRpc::XmlRpcValue &value, ControlInfo &info);
+
+    // Parse control value section
+    void parseControlValue(const XmlRpc::XmlRpcValue &value, ControlInfo &info);
+
+
     void configure(Planner &planner, const ros::NodeHandle handle) {
 
         ROS_INFO("Configuring Planner...");
@@ -9,27 +25,12 @@ namespace sbmpo {
         handle.getParam("max_iterations", planner.options.max_iterations);
         handle.getParam("max_generations", planner.options.max_generations);
         handle.getParam("sample_size", planner.options.sample_size);
+        handle.getParam("sample_time", planner.options.sample_time);
+        handle.getParam("sample_time_increment", planner.options.sample_time_increment);
 
         ROS_INFO("Max Iterations: %d", planner.options.max_iterations);
         ROS_INFO("Max generations: %d", planner.options.max_generations);
         ROS_INFO("Sample size: %d", planner.options.sample_size);
-
-        std::string sample_type;
-        handle.getParam("sample_type", sample_type);
-        planner.options.sample_type = toSampleType(sample_type);
-
-        ROS_INFO("Sample type: %s (%i)", sample_type.c_str(), planner.options.sample_type);
-
-        if (planner.options.sample_type == SampleType::INPUT) {
-            XmlRpc::XmlRpcValue samples;
-            handle.getParam("samples", samples);
-            ROS_INFO("Samples:");
-            generateSampleList(planner.options.sample_list, samples);
-        }
-
-        handle.getParam("sample_time", planner.options.sample_time);
-        handle.getParam("sample_time_increment", planner.options.sample_time_increment);
-
         ROS_INFO("Sample Time: %.2f", planner.options.sample_time);
         ROS_INFO("Sample Time Increment: %.2f", planner.options.sample_time_increment);
 
@@ -81,20 +82,6 @@ namespace sbmpo {
 
         initialize(planner);
 
-    }
-
-    void generateSampleList(SampleList &sample_list, const XmlRpc::XmlRpcValue &samples) {
-        for (int i = 0; i < samples.size(); i++) {
-            Control control;
-            XmlRpc::XmlRpcValue sample = samples[i];
-            std::string list_str;
-            for (int j = 0; j < sample.size(); j++) {
-                control.push_back(float(double(sample[j])));
-                list_str += " " + std::to_string(control.back());
-            }
-            sample_list.push_back(control);
-            ROS_INFO("- [%s ]", list_str.c_str());
-        }
     }
 
     void parseStateName(const XmlRpc::XmlRpcValue &value, StateInfo &info) {

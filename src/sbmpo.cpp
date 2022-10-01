@@ -80,13 +80,10 @@ namespace sbmpo {
         child.generation = node.generation + 1;
         child.state = node.state;
         child.heuristic = node.heuristic;
-
-        // Generate set of controls
-        Control control = generateSamples(planner.options, index, n);
-        child.control = control;
+        child.control = node.control;
 
         // Evaluate using external function
-        if (!evaluate(child, planner))
+        if (!evaluate(child, planner, n))
             return INVALID_INDEX;
 
         // Get location on implicit grid

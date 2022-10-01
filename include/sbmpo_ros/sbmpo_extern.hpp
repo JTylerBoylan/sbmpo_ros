@@ -6,7 +6,7 @@
 namespace sbmpo {
 
     // Evaluate a node with a control
-    extern bool evaluate(Node &node, const Planner &planner);
+    extern bool evaluate(Node &node, const Planner &planner, const int n);
 
     // Send external data into sbmpo
     template<class T> 

@@ -65,61 +65,6 @@ namespace sbmpo {
 
 
     /*
-        Sample Generation Functions
-    */
-
-    Control generateHaltonSamples(const int n, const unsigned int seed) {
-        Control samples;
-        double x;
-        int k, p, num;
-        for (int j = 0; j < n; j++) {
-            x = 0.0, k = 1, p = primes[j], num = seed;
-            while (num > 0) {
-                x += double(num % p) / pow(p, k++);
-                num /= p;
-            }
-            samples.push_back(x);
-        }
-        return samples;
-    }
-
-    Control generateRandomSamples(const int n, const unsigned int seed) {
-        if (!seeded_rand) {
-            srand(seed);
-            seeded_rand = true;
-        }
-        Control samples;
-        for (int j = 0; j < n; j++)
-            samples.push_back(double(rand()) / RAND_MAX);
-        return samples;
-    }
-
-    Control generateSamples(const PlannerOptions &options, const int index, const int n) {
-
-        SampleType sample_type = options.sample_type;
-        const int control_size = options.control_info.size();
-        Control control;
-
-        if (sample_type == SampleType::INPUT)
-            return options.sample_list[n];
-        else if (sample_type == SampleType::RANDOM) {
-            control = generateRandomSamples(control_size);
-        } else if (sample_type == SampleType::HALTON) {
-            control = generateHaltonSamples(control_size, index);
-        }
-
-        for (int i = 0; i < control_size; i++) {
-            const float lower_bound = options.control_info[i].range[0];
-            const float upper_bound = options.control_info[i].range[0];
-            control[i] *= upper_bound - lower_bound;
-            control[i] += lower_bound;
-        }
-        
-        return control;
-    }
-
-
-    /*
         Implicit Grid Functions
     */
 
@@ -184,20 +129,6 @@ namespace sbmpo {
     void deconstruct(Planner &planner) {
         delete[] planner.buffer;
         delete[] planner.grid.buffer;
-    }
-
-    /*
-        Conversions
-    */
-
-    SampleType toSampleType(const std::string &type) {
-        if (type == "input")
-            return SampleType::INPUT;
-        if (type == "random")
-            return SampleType::RANDOM;
-        if (type == "halton")
-            return SampleType::HALTON;
-        return SampleType::INPUT;
     }
 
 }
