@@ -31,6 +31,7 @@ namespace sbmpo {
         Heuristic heuristic;
         Index id;
         Index parent_id;
+        Index child_id;
         int generation;
     };
 

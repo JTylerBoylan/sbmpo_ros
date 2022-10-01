@@ -30,6 +30,9 @@ namespace sbmpo {
     // Determine if state is goal
     bool isGoal(const State &state, const StateInfoList &info_list);
 
+    // Subtract g score from all successor nodes by some value
+    void updateSuccessors(Node &node, Planner &planner, const float diff, const Index start);
+
 
     /*
         Sample Generation Functions

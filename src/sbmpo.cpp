@@ -44,6 +44,9 @@ namespace sbmpo {
                     queue.push(response);
             }
 
+            // Update nodes child index
+            node.child_id = high + 1;
+
             // Update highest node
             high += options.sample_size;
 
@@ -95,8 +98,13 @@ namespace sbmpo {
             Node &grid_node = planner.buffer[grid_node_index];
 
             // If the child node has a lower g score than the existing one, replace the existing node
-            if (child.heuristic[1] < grid_node.heuristic[1])
+            const float diff = child.heuristic[1] - grid_node.heuristic[1];
+            if (diff < 0) {
+                child.child_id = grid_node.child_id;
                 grid_node = child;
+                // Propogate difference in g to child nodes
+                updateSuccessors(grid_node, planner, diff, node.id);
+            }
 
             // No need to add node to priority queue because the existing node was already added and
             // the samples would be identical given they are the same

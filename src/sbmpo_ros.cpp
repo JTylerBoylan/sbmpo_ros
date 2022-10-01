@@ -121,6 +121,7 @@ namespace sbmpo {
                     ROS_INFO("  Goal range: [%.2f %.2f]", goal[0], goal[1]);
                     info.goal_avg = (goal[0] + goal[1]) / 2.0f;
                     ROS_INFO("  Goal average: %.2f", info.goal_avg);
+                    info.defined_goal = true;
                 }
                 ROS_INFO("  Defined goal: %s", info.defined_goal ? "true" : "false");
             } else {
@@ -191,18 +192,31 @@ namespace sbmpo {
         const float y = node.state[1];
         const float w = node.state[2];
 
-        const grid_map::Position pos(x, y);
-        const float z = map.atPosition("elevation", pos);
+        const grid_map::Position og(x, y);
+        const float z = map.atPosition("elevation", og);
 
-        Eigen::Vector3d forward(cos(w), sin(w), 0.0);
-        const grid_map::Position fwd(x + forward.x(), y + forward.y());
-        forward.z() = map.isInside(fwd) ? map.atPosition("elevation", fwd) - z : 0.0;
+        const int n = 4;
 
-        Eigen::Vector3d lateral(cos(w + M_PI_2), sin(w + M_PI_2), 0.0);
-        const grid_map::Position lat(x + lateral.x(), y + lateral.y());
-        lateral.z() = map.isInside(lat) ? map.atPosition("elevation", lat) - z : 0.0;
+        Eigen::Vector3d vectors[n];
+        for (int v = 0; v < n; v++) {
+            const double rot = 2.0*M_PI*double(v)/double(n);
+            vectors[v] = Eigen::Vector3d(cos(w + rot), sin(w + rot), 0.0);
+            const grid_map::Position pos(x + vectors[v].x(), y + vectors[v].y());
+            vectors[v].z() = map.isInside(pos) ? map.atPosition("elevation", pos) - z : 0.0;
+        }
 
-        Eigen::Vector3d normal = forward.cross(lateral).normalized();
+        // Normalization from "3D Math Primer for Graphics and Game Development"
+        Eigen::Vector3d normal(0.0, 0.0, 0.0);
+        Eigen::Vector3d prev = vectors[n-1];
+        for (int i = 0; i < n; i++) {
+            const Eigen::Vector3d curr = vectors[i];
+            normal.x() += (prev.z() + curr.z()) * (prev.y() - curr.y());
+            normal.y() += (prev.x() + curr.x()) * (prev.z() - curr.z());
+            normal.z() += (prev.y() + curr.y()) * (prev.x() - curr.x());
+            prev = curr;
+        }
+
+        normal.normalize();
 
         const double sin_w2 = sin(w / 2.0);
         const double cos_w2 = cos(w / 2.0);

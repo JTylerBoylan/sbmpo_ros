@@ -8,8 +8,6 @@ namespace sbmpo {
 
     void initializeBuffer(NodeBuffer &buffer, const size_t size) {
         buffer = new Node[size];
-        for (Index idx = 0; idx < size; idx++)
-            buffer[idx].id = -1;
     }
 
     void initializeGrid(ImplicitGrid &grid, const PlannerOptions &options) {
@@ -37,7 +35,7 @@ namespace sbmpo {
         for (int c = 0; c < options.control_info.size(); c++)
             starting_node.control.push_back(options.control_info[c].initial_value);
         starting_node.id = 0;
-        starting_node.parent_id = -1;
+        starting_node.parent_id = INVALID_INDEX;
         starting_node.generation = 0;
         starting_node.heuristic = {MAXFLOAT, 0.0};
         return starting_node;
@@ -53,6 +51,16 @@ namespace sbmpo {
             }
         }
         return true;
+    }
+
+    void updateSuccessors(Node &node, Planner& planner, const float diff, const Index start) {
+        Index child_start = node.child_id;
+        if (child_start != INVALID_INDEX && child_start != start)
+            for (int c = 0; c < planner.options.sample_size; c++) {
+                Node& child = planner.buffer[child_start + c];
+                child.heuristic[1] -= diff;
+                updateSuccessors(child, planner, diff, start);
+            }
     }
 
 
@@ -156,13 +164,14 @@ namespace sbmpo {
         planner.buffer_size = planner.options.max_iterations*planner.options.sample_size + 1;
         initializeBuffer(planner.buffer, planner.buffer_size);
         initializeGrid(planner.grid, planner.options);
-        planner.results.best = 0;
-        planner.results.high = 0;
+        planner.results.high = planner.buffer_size;
     }
 
     void reset(Planner &planner) {
-        for (Index idx = 0; idx < planner.results.high; idx++)
+        for (Index idx = 0; idx < planner.results.high; idx++) {
             planner.buffer[idx].id = -1;
+            planner.buffer[idx].child_id = -1;
+        }
         for (Index idx = 0; idx < planner.grid.max_size; idx++)
             planner.grid.buffer[idx] = -1;
         planner.results.best = 0;
