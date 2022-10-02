@@ -5,7 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Status1
-        - /GridMap1/Status1
+        - /Grid1/Offset1
       Splitter Ratio: 0.5029411911964417
     Tree Height: 839
   - Class: rviz/Selection
@@ -44,11 +44,11 @@ Visualization Manager:
       Name: Grid
       Normal Cell Count: 0
       Offset:
-        X: 0
-        Y: 0
+        X: 2.5
+        Y: 2.5
         Z: 0
       Plane: XY
-      Plane Cell Count: 10
+      Plane Cell Count: 7
       Reference Frame: <Fixed Frame>
       Value: true
     - Alpha: 1
@@ -141,7 +141,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 11.549382209777832
+      Distance: 9.308334350585938
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -149,17 +149,17 @@ Visualization Manager:
         Value: false
       Field of View: 1
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: 2.5071494579315186
+        Y: 2.4705545902252197
+        Z: 0.27383607625961304
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8347972631454468
+      Pitch: 1.5647963285446167
       Target Frame: <Fixed Frame>
-      Yaw: 3.1257970333099365
+      Yaw: 4.705804347991943
     Saved: ~
 Window Geometry:
   Displays:

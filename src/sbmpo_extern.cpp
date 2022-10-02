@@ -51,11 +51,11 @@ namespace sbmpo {
 
         // Find collision between body and obstacle or 
         const Vector origin(x,y);
-        const Eigen::Rotation2Df rotation(w);
+        const Eigen::Matrix2d rotation = Eigen::Rotation2Dd(w).toRotationMatrix();
         for (int bd = 0; bd < 4; bd++) {
 
-            const Vector x1 = body[bd] + origin;
-            const Vector x2 = body[(bd+1)%4] + origin;
+            const Vector x1 = rotation * body[bd] + origin;
+            const Vector x2 = rotation * body[(bd+1)%4] + origin;
             const Vector v = x2 - x1;
             const Vector del = v.normalized();
 
