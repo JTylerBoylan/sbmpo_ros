@@ -5,19 +5,28 @@ namespace sbmpo {
 
     static grid_map::GridMap * map;
 
-    #define BODY_WIDTH 0.5
-    #define BODY_HEIGHT 0.5
+    typedef Eigen::Vector2f Vector;
+    typedef std::pair<Vector, float> Obstacle;
 
-    const float bounds[2][2] = {
+    const Vector bounds[2] = {
         {-1.0, -1.0},
         {6.0, 6.0}  
     };
 
-    const float body[4][4] = {
+    #define BODY_WIDTH 0.5
+    #define BODY_HEIGHT 0.5
+    const Vector body[4] = {
         {0.0, 0.0},
         {0.0, BODY_HEIGHT},
         {BODY_WIDTH, BODY_HEIGHT},
         {BODY_WIDTH, 0.0}
+    };
+
+    #define NUM_OBSTACLES 3
+    const Obstacle obstacles[NUM_OBSTACLES] = {
+        {{3.1, 1,2}, 0.5f},
+        {{3.5, 3.7}, 0.5f},
+        {{1.0, 0.5}, 0.5f}
     };
 
 
@@ -38,16 +47,52 @@ namespace sbmpo {
     }
 
     bool isValid(const float x, const float y, const float w) {
-        // !-- TODO --!
 
-        // Check if body corners are
-        for (int i = 0; i < 4; i++) {
-            const float x = body[i][0];
-            const float y = body[i][1];
-            const float xr = x * cosf(w) - y * sinf(w);
-            const float yr = x * sinf(w) + y * cosf(w);
+        // Find collision between body and obstacle or 
+        const Vector origin(x,y);
+        const Eigen::Rotation2Df rotation(w);
+        for (int bd = 0; bd < 4; bd++) {
+
+            const Vector x1 = body[bd] + origin;
+            const Vector x2 = body[(bd+1)%4] + origin;
+            const Vector v = x2 - x1;
+            const Vector del = v.normalized();
+
+            // Bounds check
+            Vector lowleft = x1 - bounds[0];
+            Vector upright = bounds[1] - x1;
+            if (lowleft.x() < 0 || lowleft.y() < 0 ||
+                upright.x() < 0 || upright.y() < 0)
+                return false;
+
+            // Collision check
+            for (int ob = 0; ob < NUM_OBSTACLES; ob++) {
+
+                const Vector obstacle = obstacles[ob].first;
+                const float threshold = obstacles[ob].second;
+                const Vector A = obstacle - x1;
+                const float d = A.x() * del.y() - A.y() * del.x();
+
+                if (abs(d) > threshold)
+                    continue;
+
+                const Vector B = obstacle - x2;
+                const float dx1 = del.dot(x1);
+                const float dx2 = del.dot(x2);
+                const float dob = del.dot(obstacle);
+
+                if (A.norm() < threshold ||
+                    B.norm() < threshold ||
+                    (dx1 < dob &&
+                     dob < dx2) ||
+                    (dx2 < dob &&
+                     dob < dx1))
+                    return false;
+
+            }
         }
 
+        return true;
     }
 
     bool evaluate(Node &node, const Planner &planner, const int n) {
