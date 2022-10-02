@@ -1,27 +1,27 @@
 states:
   - name: 'X'
     value:
-      initial: 122.0
-      goal: 65.0
-      goal_radius: 2.5
+      initial: 0.0
+      goal: 5.0
+      goal_radius: 0.3
     implicit_grid:
       active: true
-      resolution: 1.0
-      size: 141
+      resolution: 0.075
+      size: 100
 
   - name: 'Y'
     value:
-      initial: 122.0
-      goal: 65.0
-      goal_radius: 2.5
+      initial: 0.0
+      goal: 5.0
+      goal_radius: 0.3
     implicit_grid:
       active: true
-      resolution: 1.0
-      size: 141
+      resolution: 0.075
+      size: 100
 
   - name: 'W'
     value:
-      initial: 3.9270
+      initial: 0.0
       goal: 0.0
       goal_radius: -1.0
     implicit_grid:
@@ -29,23 +29,15 @@ states:
       resolution: 0.31416
       size: 20
 
-  - name: 'T'
-    value:
-      initial: 300.0
-      goal: 0.0
-      goal_radius: -1.0
-    implicit_grid:
-      active: false
-
 controls:
   - name: 'V'
     value:
       initial: 0.0
       range_min: 0.0
-      range_max: 1.0
+      range_max: 0.6
   - name: 'U'
     value:
       initial: 0.0
-      range_min: -0.105
-      range_max: 0.105
+      range_min: -0.785
+      range_max: 0.785
 

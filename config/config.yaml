@@ -1,6 +1,8 @@
 max_iterations: 10000
 max_generations: 25
 
-sample_size: 3
-sample_time: 10.0
-sample_time_increment: 1.0
+sample_size: 7
+sample_time: 0.5
+sample_time_increment: 0.01
+
+sampling_horizon: 6
