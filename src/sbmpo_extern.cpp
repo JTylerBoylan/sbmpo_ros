@@ -1,27 +1,19 @@
 #include <sbmpo_ros/sbmpo_extern.hpp>
-#include <Eigen/Dense>
+#include <grid_map_core/GridMap.hpp>
 
 namespace sbmpo {
 
-    typedef std::array<float, 3> Obstacle;
-    typedef std::array<float, 2> Point;
+    static grid_map::GridMap * map;
 
     #define BODY_WIDTH 0.5
     #define BODY_HEIGHT 0.5
 
-    // Parameters
-    const Obstacle obstacles[3] = {
-        {3.1, 1.2, 0.5},
-        {3.5, 3.7, 0.5},
-        {1.0, 0.5, 0.5}
-    };
-
-    const Point bounds[2] = {
+    const float bounds[2][2] = {
         {-1.0, -1.0},
         {6.0, 6.0}  
     };
 
-    const Point body[4] = {
+    const float body[4][4] = {
         {0.0, 0.0},
         {0.0, BODY_HEIGHT},
         {BODY_WIDTH, BODY_HEIGHT},
@@ -45,8 +37,17 @@ namespace sbmpo {
         // !-- TODO --!
     }
 
-    bool isValid(const float x, const float y) {
+    bool isValid(const float x, const float y, const float w) {
         // !-- TODO --!
+
+        // Check if body corners are
+        for (int i = 0; i < 4; i++) {
+            const float x = body[i][0];
+            const float y = body[i][1];
+            const float xr = x * cosf(w) - y * sinf(w);
+            const float yr = x * sinf(w) + y * cosf(w);
+        }
+
     }
 
     bool evaluate(Node &node, const Planner &planner, const int n) {
@@ -87,7 +88,7 @@ namespace sbmpo {
             const float ny = y + sinf(nw) * v * sample_time_increment;
 
             // Check if valid
-            if (!isValid(nx, ny))
+            if (!isValid(nx, ny, nw))
                 break;
 
             // Update positions if valid
@@ -106,7 +107,12 @@ namespace sbmpo {
         return true;
     }
 
-    template<class T> void send_external(T &obj) {}
+    template<class T> void send_external(T &obj) {
+        map = &obj;
+    }
+
+    template void send_external<grid_map::GridMap>(grid_map::GridMap&);
+
 
     /*
         Sample Generation Functions
