@@ -2,6 +2,7 @@
 #define SBMPO_EXTERN_HPP
 
 #include <sbmpo_ros/sbmpo_types.hpp>
+#include <ros/console.h>
 
 namespace sbmpo {
 

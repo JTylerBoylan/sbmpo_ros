@@ -37,7 +37,7 @@ namespace sbmpo {
         starting_node.id = 0;
         starting_node.parent_id = INVALID_INDEX;
         starting_node.generation = 0;
-        starting_node.heuristic = {MAXFLOAT, 0.0};
+        starting_node.heuristic = {INFINITY, 0.0};
         return starting_node;
     }
 

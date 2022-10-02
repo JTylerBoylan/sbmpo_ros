@@ -24,7 +24,7 @@ int main (int argc, char ** argv) {
 
     grid_map::GridMap map({"elevation", "obstacle"});
     map.setFrameId("map");
-    map.setGeometry(grid_map::Length(7.0, 7.0), 0.07);
+    map.setGeometry(grid_map::Length(7.0, 7.0), 0.0175);
     map.setPosition(grid_map::Position(2.5, 2.5));
     sbmpo::get_external(map);
 
@@ -69,6 +69,14 @@ int main (int argc, char ** argv) {
         path_pub.publish(path);
 
         ROS_INFO("Planner Path published. \tComputing Time: %.2f ms (Avg: %.2f ms)", t, tt / n);
+        ROS_INFO("---- PATH ----");
+        for (sbmpo::Index idx : planner.results.path) {
+            sbmpo::Node node = planner.buffer[idx];
+            ROS_INFO("[%d] (x: %.2f, y: %.2f, w: %.2f) (v: %.2f, u: %.2f) (f: %.2f, g: %.2f)", 
+                node.id, node.state[0], node.state[1], node.state[2], 
+                node.control[0], node.control[1], 
+                node.heuristic[0], node.heuristic[1]);
+        }
 
         if (publish_all) {
             all_poses.header.frame_id = map.getFrameId();

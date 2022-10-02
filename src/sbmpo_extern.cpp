@@ -109,7 +109,7 @@ namespace sbmpo {
         // Generate set of controls
         //Control control = controls[n];
         //Control control = generateRandomSamples(node.control.size(), node.id, planner.options.control_info);
-        Control control = generateHaltonSamples(node.control.size(), node.id + 1000, planner.options.control_info);
+        Control control = generateHaltonSamples(node.control.size(), node.id + 123, planner.options.control_info);
         node.control = control;
         const float v = control[0];
         const float u = control[1];
@@ -161,7 +161,7 @@ namespace sbmpo {
         map.get("obstacle").setConstant(0.0);
         for (int ob = 0; ob < NUM_OBSTACLES; ob++)
             for (auto iter = grid_map::CircleIterator(map, obstacles[ob].first, obstacles[ob].second); 
-                    iter.isPastEnd(); ++iter)
+                    !iter.isPastEnd(); ++iter)
                 map.at("obstacle", *iter) = 1.0;
     }
 
