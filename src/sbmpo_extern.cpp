@@ -92,8 +92,8 @@ namespace sbmpo {
         const float v0 = parent.control[0];
         const float u0 = parent.control[1];
 
-        const float gx = planner.options.state_info[0].goal_avg;
-        const float gy = planner.options.state_info[1].goal_avg;
+        const float gx = planner.options.state_info[0].goal_value;
+        const float gy = planner.options.state_info[1].goal_value;
 
         // Generate set of controls
         Control control = controls[n];
@@ -183,8 +183,8 @@ namespace sbmpo {
                 x += double(num % p) / pow(p, k++);
                 num /= p;
             }
-            const float lower_bound = info[j].range[0];
-            const float upper_bound = info[j].range[1];
+            const float lower_bound = info[j].range_min;
+            const float upper_bound = info[j].range_max;
             x *= upper_bound - lower_bound;
             x += lower_bound;
             control.push_back(x);
@@ -201,8 +201,8 @@ namespace sbmpo {
         Control samples;
         for (int j = 0; j < n; j++) {
             float x = double(rand()) / RAND_MAX;
-            const float lower_bound = info[j].range[0];
-            const float upper_bound = info[j].range[1];
+            const float lower_bound = info[j].range_min;
+            const float upper_bound = info[j].range_max;
             x *= upper_bound - lower_bound;
             x += lower_bound;
             samples.push_back(x);

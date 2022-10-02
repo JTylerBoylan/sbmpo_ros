@@ -42,15 +42,14 @@ namespace sbmpo {
     }
 
     bool isGoal(const State &state, const StateInfoList &info_list) {
+        float sum = 0.0f;
         for (int i = 0; i < state.size(); i++) {
             const StateInfo &info = info_list[i];
             const float val = state[i];
-            if (info.defined_goal) {
-                if (val < info.goal_value[0] || val > info.goal_value[1])
-                    return false;
-            }
+            if (info.goal_radius != -1.0f)
+                sum += powf((state[i] - info.goal_value) / info.goal_radius, 2.0f);
         }
-        return true;
+        return sum <= 1.0f;
     }
 
     void updateSuccessors(Node &node, Planner& planner, const float diff, const Index start) {

@@ -53,30 +53,23 @@ namespace sbmpo {
         Index * buffer;
     };
 
-    // Type to indicate array is a range
-    typedef std::array<float, 2> Range;
-
-    // Type to hold pointer to control equation
-    typedef float (*ControlEquation)(float*, float*);
-
     // Struct to hold state information
     struct StateInfo {
         std::string name;
         float initial_value;
-        Range goal_value;
-        float goal_avg;
-        bool defined_goal;
+        float goal_value;
+        float goal_radius;
         bool grid;
         float grid_resolution;
         int grid_size;
-        ControlEquation equation;
     };
 
     // Struct to hold control information
     struct ControlInfo {
         std::string name;
         float initial_value;
-        Range range;
+        float range_min;
+        float range_max;
     };
 
     // Types for lists of states and controls

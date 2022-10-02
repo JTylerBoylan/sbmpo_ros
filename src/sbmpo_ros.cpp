@@ -96,22 +96,12 @@ namespace sbmpo {
                 info.initial_value = float(double(param->second));
                 ROS_INFO("  Initial value: %.2f", info.initial_value);
             } else if (name == "goal") {
-                if (param->second.getType() == XmlRpc::XmlRpcValue::TypeBoolean)
-                    info.defined_goal = bool(param->second);
-                else {
-                    Range goal;
-                    for (int i = 0; i < param->second.size(); i++)
-                        goal[i] = float(double(param->second[i]));
-                    if (param->second.size() < 2)
-                        goal[1] = goal[0];
-                    info.goal_value = goal;
-                    ROS_INFO("  Goal range: [%.2f %.2f]", goal[0], goal[1]);
-                    info.goal_avg = (goal[0] + goal[1]) / 2.0f;
-                    ROS_INFO("  Goal average: %.2f", info.goal_avg);
-                    info.defined_goal = true;
-                }
-                ROS_INFO("  Defined goal: %s", info.defined_goal ? "true" : "false");
-            } else {
+                info.goal_value = float(double(param->second));
+                ROS_INFO("  Goal value: %.2f", info.goal_value);
+            } else if (name == "goal_radius") {
+                info.goal_radius = float(double(param->second));
+                ROS_INFO("  Goal radius: %.2f", info.goal_radius);
+            } else  {
                 ROS_ERROR("Unknown state value parameter: %s", name.c_str());
             }
         }
@@ -146,12 +136,12 @@ namespace sbmpo {
             if (name == "initial") {
                 info.initial_value = float(double(param->second));
                 ROS_INFO("  Initial value: %.2f", info.initial_value);
-            } else if (name == "range") {
-                Range range;
-                for (int i = 0; i < 2; i++)
-                    range[i] = float(double(param->second[i]));
-                info.range = range;
-                ROS_INFO("  Value range: [%.2f %.2f]", range[0], range[1]);
+            } else if (name == "range_min") {
+                info.range_min = float(double(param->second));
+                ROS_INFO("  Range min: %.2f", info.range_min);
+            } else if (name == "range_max") {
+                info.range_max = float(double(param->second));
+                ROS_INFO("  Range max: %.2f", info.range_max);
             } else {
                 ROS_ERROR("Unknown control value parameter: %s", name.c_str());
             }
