@@ -1,11 +1,10 @@
 #include <sbmpo_ros/sbmpo_extern.hpp>
 #include <grid_map_core/GridMap.hpp>
+#include <grid_map_core/iterators/CircleIterator.hpp>
 
 namespace sbmpo {
 
-    static grid_map::GridMap * map;
-
-    typedef Eigen::Vector2f Vector;
+    typedef Eigen::Vector2d Vector;
     typedef std::pair<Vector, float> Obstacle;
 
     const Vector bounds[2] = {
@@ -24,9 +23,9 @@ namespace sbmpo {
 
     #define NUM_OBSTACLES 3
     const Obstacle obstacles[NUM_OBSTACLES] = {
-        {{3.1, 1,2}, 0.5f},
-        {{3.5, 3.7}, 0.5f},
-        {{1.0, 0.5}, 0.5f}
+        {{3.1, 1.2}, 0.5},
+        {{3.5, 3.7}, 0.5},
+        {{1.0, 0.5}, 0.5}
     };
 
 
@@ -39,11 +38,13 @@ namespace sbmpo {
     // G-score increment for a given sample
     float dg(const float dt, const float v, const float u) {
         // !-- TODO --!
+        return 1.0;
     }
 
     // H-score for a given node
     float h(const float x, const float y, const float w, const float gx, const float gy) {
         // !-- TODO --!
+        return 0.0;
     }
 
     bool isValid(const float x, const float y, const float w) {
@@ -108,7 +109,7 @@ namespace sbmpo {
         // Generate set of controls
         //Control control = controls[n];
         //Control control = generateRandomSamples(node.control.size(), node.id, planner.options.control_info);
-        Control control = generateHaltonSamples(node.control.size(), node.id, planner.options.control_info);
+        Control control = generateHaltonSamples(node.control.size(), node.id + 1000, planner.options.control_info);
         node.control = control;
         const float v = control[0];
         const float u = control[1];
@@ -152,11 +153,19 @@ namespace sbmpo {
         return true;
     }
 
-    template<class T> void send_external(T &obj) {
-        map = &obj;
+    template<class T> void send_external(T &obj) {}
+
+    template<class T> void get_external(T &obj) {
+        grid_map::GridMap &map = obj;
+        map.get("elevation").setConstant(0.0);
+        map.get("obstacle").setConstant(0.0);
+        for (int ob = 0; ob < NUM_OBSTACLES; ob++)
+            for (auto iter = grid_map::CircleIterator(map, obstacles[ob].first, obstacles[ob].second); 
+                    iter.isPastEnd(); ++iter)
+                map.at("obstacle", *iter) = 1.0;
     }
 
-    template void send_external<grid_map::GridMap>(grid_map::GridMap&);
+    template void get_external<grid_map::GridMap>(grid_map::GridMap&);
 
 
     /*

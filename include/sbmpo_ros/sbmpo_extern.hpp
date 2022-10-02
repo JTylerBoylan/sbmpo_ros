@@ -12,6 +12,10 @@ namespace sbmpo {
     template<class T> 
     extern void send_external(T &obj);
 
+    // Get external data from sbmpo
+    template<class T>
+    extern void get_external(T &obj);
+
 }
 
 #endif

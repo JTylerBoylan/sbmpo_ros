@@ -10,18 +10,7 @@
         <param name="publish_all" value="true"/>
         <param name="publish_rate" value="1"/>
     </node>
-
-    <node name="mat2gridmap" pkg="sbmpo_ros" type="mat2gridmap.py" output="screen">
-        <param name="publish_topic" value="/map"/>
-        <param name="data_file" value="data/dataforlocalplanner.mat"/>
-        <param name="frame_id" value="map"/>
-        <param name="resolution" value="1.0"/>
-        <param name="length_x" value="141"/>
-        <param name="length_y" value="141"/>
-        <param name="position_x" value="70.0"/>
-        <param name="position_y" value="70.0"/>
-    </node>
-
+    
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find sbmpo_ros)/config/map.rviz" />
 
 </launch>

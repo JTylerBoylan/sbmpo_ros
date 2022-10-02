@@ -22,17 +22,13 @@ int main (int argc, char ** argv) {
     float publish_rate;
     handle.getParam("publish_rate", publish_rate);
 
-    grid_map::GridMap map;
-    bool map_init = false;
+    grid_map::GridMap map({"elevation", "obstacle"});
+    map.setFrameId("map");
+    map.setGeometry(grid_map::Length(7.0, 7.0), 0.07);
+    map.setPosition(grid_map::Position(2.5, 2.5));
+    sbmpo::get_external(map);
 
-    auto mapCallback = [&](const grid_map_msgs::GridMapConstPtr &map_msg) {
-        if (!map_init) map_init = true;
-        grid_map::GridMapRosConverter::fromMessage(*map_msg, map);
-        sbmpo::send_external<grid_map::GridMap>(map);
-    };
-
-    ros::Subscriber map_sub = handle.subscribe<grid_map_msgs::GridMap>(map_topic, 10, mapCallback);
-
+    ros::Publisher map_pub = handle.advertise<grid_map_msgs::GridMap>(map_topic, 1, true);
     ros::Publisher path_pub = handle.advertise<nav_msgs::Path>(path_topic, 10, true);
     ros::Publisher poses_pub = handle.advertise<geometry_msgs::PoseArray>(poses_topic, 1, true);
 
@@ -44,8 +40,9 @@ int main (int argc, char ** argv) {
 
         ros::spinOnce();
 
-        if (!map_init)
-            continue;
+        grid_map_msgs::GridMap map_msg;
+        grid_map::GridMapRosConverter::toMessage(map, map_msg);
+        map_pub.publish(map_msg);
 
         ROS_INFO("Running planner...");
 
