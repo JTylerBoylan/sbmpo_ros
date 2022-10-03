@@ -1,6 +1,7 @@
 #include <sbmpo_ros/sbmpo_extern.hpp>
 #include <grid_map_core/GridMap.hpp>
 #include <grid_map_core/iterators/CircleIterator.hpp>
+#include <sbmpo_ros/halton.hpp>
 
 namespace sbmpo {
 
@@ -12,8 +13,8 @@ namespace sbmpo {
         {6.0, 6.0}  
     };
 
-    #define BODY_WIDTH 0.5
-    #define BODY_HEIGHT 0.5
+    #define BODY_WIDTH 0.1
+    #define BODY_HEIGHT 0.1
     const Vector body[4] = {
         {0.0, 0.0},
         {0.0, BODY_HEIGHT},
@@ -37,14 +38,18 @@ namespace sbmpo {
 
     // G-score increment for a given sample
     float dg(const float dt, const float v, const float u) {
-        // !-- TODO --!
-        return 1.0;
+        return v * dt;
     }
 
     // H-score for a given node
     float h(const float x, const float y, const float w, const float gx, const float gy) {
-        // !-- TODO --!
-        return 0.0;
+        const float dx = gx - x;
+        const float dy = gy - y;
+        float dw = atan2f(dy,dx) - w;
+        if (dw > M_PI || dw <= -M_PI)
+            dw += dw > M_PI ? -2.0f*M_PI : 2.0*M_PI;
+        const float dt = sqrtf(dx*dx + dy*dy)/0.6f + abs(dw)/0.785f;
+        return dg(dt, 0.6, 0.785);
     }
 
     bool isValid(const float x, const float y, const float w) {
@@ -109,10 +114,12 @@ namespace sbmpo {
         // Generate set of controls
         //Control control = controls[n];
         //Control control = generateRandomSamples(node.control.size(), node.id, planner.options.control_info);
-        Control control = generateHaltonSamples(node.control.size(), node.id + 123, planner.options.control_info);
+        Control control = generateHaltonSamples(node.control.size(), node.id + 123456, planner.options.control_info);
         node.control = control;
         const float v = control[0];
         const float u = control[1];
+
+        //ROS_INFO("Sample %d: (v = %.2f, u = %.2f)", n, v, u);
 
         const float sample_time = planner.options.sample_time;
         const float sample_time_increment = planner.options.sample_time_increment;
@@ -135,7 +142,7 @@ namespace sbmpo {
 
             // Check if valid
             if (!isValid(nx, ny, nw))
-                break;
+                return false;
 
             // Update positions if valid
             w = nw; x = nx; y = ny;
@@ -149,6 +156,8 @@ namespace sbmpo {
         g += dg(sample_time, v, u);
 
         f = g + h(x, y, w, gx, gy);
+
+        //ROS_INFO("Add to queue: [%d](%.2f, %.2f, %.2f)", node.id, node.state[0], node.state[1], node.state[2]);
 
         return true;
     }
@@ -176,7 +185,18 @@ namespace sbmpo {
     static const int primes[10] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29}; 
     Control generateHaltonSamples(const int n, const unsigned int seed, const ControlInfoList &info) {
         Control control;
-        double x;
+        double *hltn = halton(seed, n);
+        for (int i = 0; i < n; i++) {
+            float x = hltn[i];
+            const float lower_bound = info[i].range_min;
+            const float upper_bound = info[i].range_max;
+            x *= upper_bound - lower_bound;
+            x += lower_bound;
+            control.push_back(x);
+        }
+        delete[] hltn;
+        return control;
+        /*double x;
         int k, p, num;
         for (int j = 0; j < n; j++) {
             x = 0.0, k = 1, p = primes[j], num = seed;
@@ -189,8 +209,7 @@ namespace sbmpo {
             x *= upper_bound - lower_bound;
             x += lower_bound;
             control.push_back(x);
-        }
-        return control;
+        }*/
     }
 
     static bool seeded_rand = false;
