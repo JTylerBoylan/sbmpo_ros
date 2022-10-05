@@ -6,6 +6,7 @@
 #include <array>
 #include <functional>
 #include <algorithm>
+#include <unordered_map>
 
 #define INVALID_INDEX -1
 
@@ -26,10 +27,10 @@ namespace sbmpo {
 
     // Struct to hold node information
     struct Node {
+        Index id;
         State state;
         Control control;
         Heuristic heuristic;
-        Index id;
         Index parent_id;
         Index child_id;
         int generation;
@@ -43,6 +44,7 @@ namespace sbmpo {
     typedef std::vector<int> GridKey;
     typedef std::vector<float> GridResolution;
     typedef std::vector<int> GridSize;
+    typedef std::unordered_map<Index, Index> IndexKeyMap;
 
     // Struct to hold implicit grid information
     struct ImplicitGrid {
@@ -50,7 +52,7 @@ namespace sbmpo {
         GridSize size;
         GridResolution resolution;
         int max_size;
-        Index * buffer;
+        IndexKeyMap map;
     };
 
     // Struct to hold state information

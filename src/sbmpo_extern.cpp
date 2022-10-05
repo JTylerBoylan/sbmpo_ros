@@ -52,20 +52,26 @@ namespace sbmpo {
     Control generateRandomSamples(const int n, const unsigned int seed, const ControlInfoList &info);
 
     // G-score increment for a given sample
-    float dg(const float dt, const float v, const float u, const float dv, const float du, 
-                        const float dz, const float T) {
+    float dg(const float dt, const float v1, const float v2, const float u1, const float u2,
+                        const float z1, const float z2, const float T) {
 
-        const float direction_factor = v > 0 ? forward_factor : reverse_factor;
+        const float dv = v2 - v1;
+        const float du = u2 - u1;
+        const float dz = z2 - z1;
+
+        const float kinetic_factor = v1 > 0 ? 1 : -1;
+        const float rotation_factor = u1 > 0 ? 1 : -1;
+        const float direction_factor = v2 > 0 ? forward_factor : reverse_factor;
         const float potential_factor = dz > 0 ? uphill_factor : downhill_factor;
         const float accel_factor = dv > 0 ? acceleration_factor : decceleration_factor;
 
         const float dT = T - desired_temperature;
         const float temperature_factor = dT > 0 ? hot_factor : cool_factor;
 
-        const float drag_energy = drag_force * abs(v) * dt * direction_factor;
+        const float drag_energy = drag_force * abs(v2) * dt * direction_factor;
         const float potential_energy = gravity_force * abs(dz) * potential_factor;
-        const float kinetic_energy = body_mass * abs(v) * abs(dv) * accel_factor;
-        const float rotation_energy = body_moment * abs(u) * abs(du) * rotational_factor;
+        const float kinetic_energy = 0.5 * body_mass * abs(v2*v2 - kinetic_factor*v1*v1);
+        const float rotation_energy = 0.5 * body_moment * abs(u2*u2 - rotation_factor*u1*u1);
 
         const float temperature_energy = abs(dT) * temperature_factor;
 
@@ -73,16 +79,16 @@ namespace sbmpo {
     }
 
     // H-score for a given node
-    float h(const float x, const float y, const float w, const float gx, const float gy) {
+    float h(const float x, const float y, const float w, const float v, const float u, const float gx, const float gy) {
         const float dx = gx - x;
         const float dy = gy - y;
         float dw = atan2f(dy,dx) - w;
         if (dw > M_PI || dw <= -M_PI)
             dw += dw > M_PI ? -2.0f*M_PI : 2.0*M_PI;
         const float dt = sqrtf(dx*dx + dy*dy)/max_velocity + abs(dw)/max_rotation;
-        const float dz = map->atPosition("elevation", grid_map::Position(gx, gy)) -
-                    map->atPosition("elevation", grid_map::Position(x, y));
-        return dg(dt, max_velocity, max_rotation, 0.0f, 0.0f, dz, desired_temperature);
+        const float z2 = map->atPosition("elevation", grid_map::Position(gx, gy));
+        const float z1 = map->atPosition("elevation", grid_map::Position(x, y));
+        return dg(dt, v, max_velocity, u, max_rotation, z1, z1, desired_temperature);
     }
 
     bool evaluate(Node &node, const Planner &planner, const int n) {
@@ -141,7 +147,7 @@ namespace sbmpo {
 
         // Get elevation data from map
         const float z0 = map->atPosition("elevation", position0);
-        const float z1 = map->atPosition("elevation", position);
+        const float z = map->atPosition("elevation", position);
 
         // Get temperature from map
         // T_K = a*T_map^2 + b*T_map + c
@@ -154,9 +160,9 @@ namespace sbmpo {
         T += heat_transfer * (powf(T_K, 4.0f) - powf(T, 4.0f)) * sample_time;
 
         // Increase g score
-        g += dg(sample_time, v, u, v - v0, u - u0, z1 - z0, T);
+        g += dg(sample_time, v0, v, u0, u, z0, z, T);
 
-        f = g + h(x, y, w, gx, gy);
+        f = g + h(x, y, w, v, u, gx, gy);
 
         return true;
     }

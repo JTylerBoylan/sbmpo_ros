@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+//#include <ros/ros.h>
+
 namespace sbmpo {
 
     /*
@@ -42,7 +44,7 @@ namespace sbmpo {
     Index toGridIndex(const GridKey &key, const ImplicitGrid &grid);
 
     // Convert node to grid index directly
-    Index& toNodeIndex(const Node &node, const ImplicitGrid &grid);
+    Index& toNodeIndex(const Node &node, ImplicitGrid &grid);
 
     // Get total grid size
     size_t totalGridSize(const GridSize &grid_size);
