@@ -1,7 +1,6 @@
 #include <sbmpo_ros/sbmpo_extern.hpp>
 #include <grid_map_core/GridMap.hpp>
 #include <grid_map_core/iterators/CircleIterator.hpp>
-#include <sbmpo_ros/halton.hpp>
 
 namespace sbmpo {
 
@@ -185,31 +184,7 @@ namespace sbmpo {
     static const int primes[10] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29}; 
     Control generateHaltonSamples(const int n, const unsigned int seed, const ControlInfoList &info) {
         Control control;
-        double *hltn = halton(seed, n);
-        for (int i = 0; i < n; i++) {
-            float x = hltn[i];
-            const float lower_bound = info[i].range_min;
-            const float upper_bound = info[i].range_max;
-            x *= upper_bound - lower_bound;
-            x += lower_bound;
-            control.push_back(x);
-        }
-        delete[] hltn;
         return control;
-        /*double x;
-        int k, p, num;
-        for (int j = 0; j < n; j++) {
-            x = 0.0, k = 1, p = primes[j], num = seed;
-            while (num > 0) {
-                x += double(num % p) / pow(p, k++);
-                num /= p;
-            }
-            const float lower_bound = info[j].range_min;
-            const float upper_bound = info[j].range_max;
-            x *= upper_bound - lower_bound;
-            x += lower_bound;
-            control.push_back(x);
-        }*/
     }
 
     static bool seeded_rand = false;
