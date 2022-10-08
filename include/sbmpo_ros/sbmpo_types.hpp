@@ -70,8 +70,6 @@ namespace sbmpo {
     struct ControlInfo {
         std::string name;
         float initial_value;
-        float range_min;
-        float range_max;
     };
 
     // Types for lists of states and controls
