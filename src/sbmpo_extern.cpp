@@ -45,12 +45,6 @@ namespace sbmpo {
         {0.75f, 0.0524f}
     };
 
-    // Generate Halton samples
-    Control generateHaltonSamples(const int n, const unsigned int seed, const ControlInfoList &info);
-
-    // Generate random samples
-    Control generateRandomSamples(const int n, const unsigned int seed, const ControlInfoList &info);
-
     // G-score increment for a given sample
     float dg(const float dt, const float v1, const float v2, const float u1, const float u2,
                         const float z1, const float z2, const float T) {
@@ -103,8 +97,7 @@ namespace sbmpo {
 
         // Generate set of controls
         Control control = controls[n];
-        //Control control = generateRandomSamples(node.control.size(), node.id, planner.options.control_info);
-        //Control control = generateHaltonSamples(node.control.size(), node.id, planner.options.control_info);
+
         node.control = control;
         const float v = control[0];
         const float u = control[1];
@@ -172,48 +165,5 @@ namespace sbmpo {
     }
 
     template void send_external<grid_map::GridMap>(grid_map::GridMap &obj);
-
-        /*
-        Sample Generation Functions
-    */
-
-    // Stores primes used in Halton sampling
-    static const int primes[10] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29}; 
-    Control generateHaltonSamples(const int n, const unsigned int seed, const ControlInfoList &info) {
-        Control control;
-        double x;
-        int k, p, num;
-        for (int j = 0; j < n; j++) {
-            x = 0.0, k = 1, p = primes[j], num = seed;
-            while (num > 0) {
-                x += double(num % p) / pow(p, k++);
-                num /= p;
-            }
-            const float lower_bound = info[j].range_min;
-            const float upper_bound = info[j].range_max;
-            x *= upper_bound - lower_bound;
-            x += lower_bound;
-            control.push_back(x);
-        }
-        return control;
-    }
-
-    static bool seeded_rand = false;
-    Control generateRandomSamples(const int n, const unsigned int seed, const ControlInfoList &info) {
-        if (!seeded_rand) {
-            srand(seed);
-            seeded_rand = true;
-        }
-        Control samples;
-        for (int j = 0; j < n; j++) {
-            float x = double(rand()) / RAND_MAX;
-            const float lower_bound = info[j].range_min;
-            const float upper_bound = info[j].range_max;
-            x *= upper_bound - lower_bound;
-            x += lower_bound;
-            samples.push_back(x);
-        }
-        return samples;
-    }
 
 }
