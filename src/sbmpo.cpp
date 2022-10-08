@@ -1,5 +1,7 @@
 #include <sbmpo_ros/sbmpo.hpp>
 
+//#include <ros/ros.h>
+
 namespace sbmpo {
 
     void run(Planner &planner) {

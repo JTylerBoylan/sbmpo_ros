@@ -25,7 +25,7 @@ namespace sbmpo {
             }
         }
         grid.max_size = totalGridSize(size);
-        grid.buffer = new Index[grid.max_size];
+        grid.map[0] = INVALID_INDEX;
     }
 
     Node startingNode(const PlannerOptions &options) {
@@ -87,10 +87,13 @@ namespace sbmpo {
         return index;
     }
 
-    Index& toNodeIndex(const Node &node, const ImplicitGrid &grid) {
+    Index& toNodeIndex(const Node &node, ImplicitGrid &grid) {
         const GridKey key = toGridKey(node.state, grid);
         const Index index = toGridIndex(key, grid);
-        return grid.buffer[index];
+        if (grid.map.count(index))
+            return grid.map[index];
+        grid.map[index] = INVALID_INDEX;
+        return grid.map[index];
     }
 
     size_t totalGridSize(const GridSize &grid_size) {
@@ -112,22 +115,21 @@ namespace sbmpo {
     }
 
     void resetPlanner(Planner &planner) {
-        for (Index idx = 0; idx < planner.results.high; idx++) {
-            planner.buffer[idx].id = -1;
-            planner.buffer[idx].child_id = -1;
+        const Node *buffer_end = &planner.buffer[planner.results.high];
+        for (Node *n = &planner.buffer[0]; n != buffer_end; ++n) {
+            n->id = -1;
+            n->child_id = -1;
         }
-        for (Index idx = 0; idx < planner.grid.max_size; idx++)
-            planner.grid.buffer[idx] = -1;
         planner.results.best = 0;
         planner.results.high = 0;
         planner.results.path.clear();
         planner.buffer[0] = startingNode(planner.options);
+        planner.grid.map.clear();
         toNodeIndex(planner.buffer[0], planner.grid) = 0;
     }
 
     void deconstructPlanner(Planner &planner) {
         delete[] planner.buffer;
-        delete[] planner.grid.buffer;
     }
 
     // CSV Reading

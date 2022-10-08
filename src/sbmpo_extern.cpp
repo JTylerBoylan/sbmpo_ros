@@ -38,12 +38,13 @@ namespace sbmpo_ext {
         ROS_INFO("Finding Halton Data in '%s'", halton_path.c_str());
         std::map<std::string, std::vector<float>> halton_csv = read_csv(halton_path);
         ROS_INFO("Found Data. Adding to controls");
+        ROS_INFO("Control samples (v, u):");
         for (int i = 0; i < NUM_SAMPLES; i++) {
-            int j = 0;
             for (auto iter = halton_csv.begin(); iter != halton_csv.end(); ++iter) {
                 const float sample = iter->second[i];
-                controls[j++].push_back(sample);
+                controls[i].push_back(sample);
             }
+            ROS_INFO("  - (%.2f, %.2f)", controls[i][0], controls[i][1]);
         }
         ROS_INFO("Initialized");
         return true;
@@ -51,7 +52,7 @@ namespace sbmpo_ext {
 
     // G-score increment for a given sample
     float dg(const float dt, const float v, const float u) {
-        return v * dt;
+        return abs(v) * dt;
     }
 
     // H-score for a given node
