@@ -136,12 +136,6 @@ namespace sbmpo {
             if (name == "initial") {
                 info.initial_value = float(double(param->second));
                 ROS_INFO("  Initial value: %.2f", info.initial_value);
-            } else if (name == "range_min") {
-                info.range_min = float(double(param->second));
-                ROS_INFO("  Range min: %.2f", info.range_min);
-            } else if (name == "range_max") {
-                info.range_max = float(double(param->second));
-                ROS_INFO("  Range max: %.2f", info.range_max);
             } else {
                 ROS_ERROR("Unknown control value parameter: %s", name.c_str());
             }
