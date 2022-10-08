@@ -1,10 +1,14 @@
 #ifndef SBMPO_UTIL_HPP
 #define SBMPO_UTIL_HPP
 
-#include <sbmpo_ros/sbmpo_extern.hpp>
+#include <sbmpo_ros/sbmpo_types.hpp>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
+#include <fstream>
+#include <stdexcept> // std::runtime_error
+#include <sstream> // std::stringstream
+#include <map>
 
 namespace sbmpo {
 
@@ -60,6 +64,12 @@ namespace sbmpo {
 
     // Delete buffers
     void deconstructPlanner(Planner &planner);
+
+    /*
+        Data File Reading
+    */
+   
+    std::map<std::string, std::vector<float>> read_csv(std::string filename);
 
 }
 

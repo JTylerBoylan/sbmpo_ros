@@ -1,7 +1,7 @@
 max_iterations: 1000
 max_generations: 20
 
-sample_size: 7
+sample_size: 11
 sample_time: 1.0
 sample_time_increment: 0.5
 

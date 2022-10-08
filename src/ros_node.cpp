@@ -8,6 +8,7 @@ int main (int argc, char ** argv) {
 
     sbmpo::Planner planner;
     sbmpo::configure(planner, handle);
+    sbmpo_ext::initialize(planner);
 
     std::string map_topic,
                 path_topic,
@@ -26,7 +27,7 @@ int main (int argc, char ** argv) {
     map.setFrameId("map");
     map.setGeometry(grid_map::Length(7.0, 7.0), 0.0175);
     map.setPosition(grid_map::Position(2.5, 2.5));
-    sbmpo::get_external(map);
+    sbmpo_ext::get_external(map);
 
     ros::Publisher map_pub = handle.advertise<grid_map_msgs::GridMap>(map_topic, 1, true);
     ros::Publisher path_pub = handle.advertise<nav_msgs::Path>(path_topic, 10, true);

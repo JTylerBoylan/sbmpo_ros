@@ -83,7 +83,7 @@ namespace sbmpo {
         child.control = node.control;
 
         // Evaluate using external function
-        if (!evaluate(child, planner, n))
+        if (!sbmpo_ext::evaluate(child, planner, n))
             return INVALID_INDEX;
 
         // Get location on implicit grid

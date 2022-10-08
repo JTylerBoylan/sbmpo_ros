@@ -2,7 +2,8 @@
 #include <grid_map_core/GridMap.hpp>
 #include <grid_map_core/iterators/CircleIterator.hpp>
 
-namespace sbmpo {
+using namespace sbmpo;
+namespace sbmpo_ext {
 
     typedef Eigen::Vector2d Vector;
     typedef std::pair<Vector, float> Obstacle;
@@ -28,12 +29,25 @@ namespace sbmpo {
         {{1.0, 0.5}, 0.5}
     };
 
+    #define NUM_SAMPLES 11
+    Control controls[NUM_SAMPLES];
 
-    // Generate Halton samples
-    Control generateHaltonSamples(const int n, const unsigned int seed, const ControlInfoList &info);
-
-    // Generate random samples
-    Control generateRandomSamples(const int n, const unsigned int seed, const ControlInfoList &info);
+    bool initialize(Planner &planner) {
+        ROS_INFO("External Initialization");
+        const std::string halton_path = ros::package::getPath("sbmpo_ros") + "/data/halton.csv";
+        ROS_INFO("Finding Halton Data in '%s'", halton_path.c_str());
+        std::map<std::string, std::vector<float>> halton_csv = read_csv(halton_path);
+        ROS_INFO("Found Data. Adding to controls");
+        for (int i = 0; i < NUM_SAMPLES; i++) {
+            int j = 0;
+            for (auto iter = halton_csv.begin(); iter != halton_csv.end(); ++iter) {
+                const float sample = iter->second[i];
+                controls[j++].push_back(sample);
+            }
+        }
+        ROS_INFO("Initialized");
+        return true;
+    }
 
     // G-score increment for a given sample
     float dg(const float dt, const float v, const float u) {
@@ -111,9 +125,7 @@ namespace sbmpo {
         const float gy = planner.options.state_info[1].goal_value;
 
         // Generate set of controls
-        //Control control = controls[n];
-        //Control control = generateRandomSamples(node.control.size(), node.id, planner.options.control_info);
-        Control control = generateHaltonSamples(node.control.size(), node.id + 123456, planner.options.control_info);
+        Control control = controls[n];
         node.control = control;
         const float v = control[0];
         const float u = control[1];
@@ -174,35 +186,5 @@ namespace sbmpo {
     }
 
     template void get_external<grid_map::GridMap>(grid_map::GridMap&);
-
-
-    /*
-        Sample Generation Functions
-    */
-
-    // Stores primes used in Halton sampling
-    static const int primes[10] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29}; 
-    Control generateHaltonSamples(const int n, const unsigned int seed, const ControlInfoList &info) {
-        Control control;
-        return control;
-    }
-
-    static bool seeded_rand = false;
-    Control generateRandomSamples(const int n, const unsigned int seed, const ControlInfoList &info) {
-        if (!seeded_rand) {
-            srand(seed);
-            seeded_rand = true;
-        }
-        Control samples;
-        for (int j = 0; j < n; j++) {
-            float x = double(rand()) / RAND_MAX;
-            const float lower_bound = info[j].range_min;
-            const float upper_bound = info[j].range_max;
-            x *= upper_bound - lower_bound;
-            x += lower_bound;
-            samples.push_back(x);
-        }
-        return samples;
-    }
 
 }
