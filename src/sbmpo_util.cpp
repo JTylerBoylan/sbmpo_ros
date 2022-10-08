@@ -104,14 +104,14 @@ namespace sbmpo {
         Planner Control Functions
     */
 
-    void initialize(Planner &planner) {
+    void initializePlanner(Planner &planner) {
         planner.buffer_size = planner.options.max_iterations*planner.options.sample_size + 1;
         initializeBuffer(planner.buffer, planner.buffer_size);
         initializeGrid(planner.grid, planner.options);
         planner.results.high = planner.buffer_size;
     }
 
-    void reset(Planner &planner) {
+    void resetPlanner(Planner &planner) {
         for (Index idx = 0; idx < planner.results.high; idx++) {
             planner.buffer[idx].id = -1;
             planner.buffer[idx].child_id = -1;
@@ -125,7 +125,7 @@ namespace sbmpo {
         toNodeIndex(planner.buffer[0], planner.grid) = 0;
     }
 
-    void deconstruct(Planner &planner) {
+    void deconstructPlanner(Planner &planner) {
         delete[] planner.buffer;
         delete[] planner.grid.buffer;
     }

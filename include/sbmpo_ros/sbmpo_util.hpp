@@ -53,13 +53,13 @@ namespace sbmpo {
     */
 
     // Initialize the planner with given options
-    void initialize(Planner &planner);
+    void initializePlanner(Planner &planner);
 
     // Reset planner
-    void reset(Planner &planner);
+    void resetPlanner(Planner &planner);
 
     // Delete buffers
-    void deconstruct(Planner &planner);
+    void deconstructPlanner(Planner &planner);
 
 }
 

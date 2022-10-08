@@ -80,7 +80,7 @@ namespace sbmpo {
 
         ROS_INFO("Initializing Planner");
 
-        initialize(planner);
+        initializePlanner(planner);
 
     }
 

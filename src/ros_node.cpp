@@ -89,6 +89,6 @@ int main (int argc, char ** argv) {
         rate.sleep();
     }
 
-    sbmpo::deconstruct(planner);
+    sbmpo::deconstructPlanner(planner);
     
 }

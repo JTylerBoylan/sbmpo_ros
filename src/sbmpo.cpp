@@ -5,7 +5,7 @@ namespace sbmpo {
     void run(Planner &planner) {
 
         // Reset planner
-        reset(planner);
+        resetPlanner(planner);
 
         // Planner components
         const PlannerOptions &options = planner.options;
