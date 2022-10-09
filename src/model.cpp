@@ -79,4 +79,8 @@ namespace model {
 
     template<class T> void get_external(T &obj) {}
 
+    template void get_external<grid_map::GridMap>(grid_map::GridMap&);
+
+
+
 }

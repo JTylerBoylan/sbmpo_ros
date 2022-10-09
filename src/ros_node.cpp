@@ -1,4 +1,4 @@
-#include <sbmpo_ros/sbmpo/sbmpo_ros.hpp>
+#include <sbmpo_ros/ros/sbmpo_ros.hpp>
 #include <grid_map_ros/grid_map_ros.hpp>
 
 int main (int argc, char ** argv) {
