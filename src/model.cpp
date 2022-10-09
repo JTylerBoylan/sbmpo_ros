@@ -1,9 +1,9 @@
-#include <sbmpo_ros/sbmpo_extern.hpp>
+#include <sbmpo_ros/model.hpp>
 #include <grid_map_core/GridMap.hpp>
 #include <grid_map_core/iterators/CircleIterator.hpp>
 
 using namespace sbmpo;
-namespace sbmpo_ext {
+namespace model {
 
     #define NUM_SAMPLES 11
     Control controls[NUM_SAMPLES];
@@ -13,24 +13,22 @@ namespace sbmpo_ext {
         return true;
     }
 
-    // G-score increment for a given sample
-    float dg(const float dt, const float v, const float u) {
+    float cost(const sbmpo::Node& current, const sbmpo::Node &next) {
         // TODO
         return 0;
     }
 
-    // H-score for a given node
-    float h(const float x, const float y, const float w, const float gx, const float gy) {
+    float heuristic(const sbmpo::Node& current, const sbmpo::State &goal) {
         //TODO
         return 0;
     }
 
-    bool isValid(const float x, const float y, const float w) {
+    bool is_valid(const sbmpo::State& state) {
         // TODO
         return true;
     }
 
-    bool evaluate(Node &node, const Planner &planner, const int n) {
+    bool next_state(Node &node, const Planner &planner, const int n) {
 
         const Node& parent = planner.buffer[node.parent_id];
 
@@ -53,9 +51,6 @@ namespace sbmpo_ext {
         float &y = node.state[1];
         float &w = node.state[2];
 
-        float &f = node.heuristic[0];
-        float &g = node.heuristic[1];
-
         for (float t = 0; t < sample_time; t += sample_time_increment) {
 
             // New yaw
@@ -66,7 +61,7 @@ namespace sbmpo_ext {
             const float ny = y + sinf(nw) * v * sample_time_increment;
 
             // Check if valid
-            if (!isValid(nx, ny, nw))
+            if (!is_valid({nx, ny, nw}))
                 return false;
 
             // Update positions if valid
@@ -76,11 +71,6 @@ namespace sbmpo_ext {
         // Yaw angle wrapping, w = (-pi, pi]
         if (w >= 2.0*M_PI || w < 0.0f)
             w += w < 0.0f ? 2.0*M_PI : -2.0*M_PI;
-
-        // Increase g score
-        g += dg(sample_time, v, u);
-
-        f = g + h(x, y, w, gx, gy);
 
         return true;
     }

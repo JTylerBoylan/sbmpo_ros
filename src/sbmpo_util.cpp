@@ -1,4 +1,4 @@
-#include <sbmpo_ros/sbmpo_util.hpp>
+#include <sbmpo_ros/sbmpo/sbmpo_util.hpp>
 
 namespace sbmpo {
 

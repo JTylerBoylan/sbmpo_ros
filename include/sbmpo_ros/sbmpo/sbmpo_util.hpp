@@ -1,7 +1,7 @@
 #ifndef SBMPO_UTIL_HPP
 #define SBMPO_UTIL_HPP
 
-#include <sbmpo_ros/sbmpo_types.hpp>
+#include <sbmpo_ros/sbmpo/sbmpo_types.hpp>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>

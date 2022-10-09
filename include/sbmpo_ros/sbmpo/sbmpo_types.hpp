@@ -83,6 +83,7 @@ namespace sbmpo {
         int sample_size;
         float sample_time;
         float sample_time_increment;
+        State goal;
         StateInfoList state_info;
         ControlInfoList control_info;
     };

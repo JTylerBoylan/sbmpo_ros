@@ -1,4 +1,4 @@
-#include <sbmpo_ros/sbmpo_ros.hpp>
+#include <sbmpo_ros/sbmpo/sbmpo_ros.hpp>
 
 namespace sbmpo {
 
@@ -57,6 +57,7 @@ namespace sbmpo {
                 }
             }
             planner.options.state_info.push_back(state_info);
+            planner.options.goal.push_back(state_info.goal_value);
         }
 
         ROS_INFO("Configuring Controls");

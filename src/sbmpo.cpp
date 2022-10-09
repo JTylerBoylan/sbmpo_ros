@@ -1,4 +1,4 @@
-#include <sbmpo_ros/sbmpo.hpp>
+#include <sbmpo_ros/sbmpo/sbmpo.hpp>
 
 //#include <ros/ros.h>
 
@@ -74,9 +74,11 @@ namespace sbmpo {
 
     Index sample(Planner &planner, const Node &node, const int n) {
 
-        // Get child node
+        // Get sampling index
         const int index = planner.results.high + n + 1;
         Node &child = planner.buffer[index];
+
+        // Initialize child node
         child.id = index;
         child.parent_id = node.id;
         child.generation = node.generation + 1;
@@ -85,8 +87,14 @@ namespace sbmpo {
         child.control = node.control;
 
         // Evaluate using external function
-        if (!sbmpo_ext::evaluate(child, planner, n))
+        if (!model::next_state(child, planner, n))
             return INVALID_INDEX;
+
+        // Calculate edge cost
+        child.heuristic[1] += model::cost(child, node);
+
+        // Calculate new f score
+        child.heuristic[0] = child.heuristic[1] + model::heuristic(child, planner.options.goal);
 
         // Get location on implicit grid
         Index& grid_node_index = toNodeIndex(child, planner.grid);
