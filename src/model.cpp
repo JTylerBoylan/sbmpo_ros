@@ -1,9 +1,9 @@
-#include <sbmpo_ros/sbmpo_extern.hpp>
+#include <sbmpo_ros/model.hpp>
 #include <grid_map_core/GridMap.hpp>
 #include <grid_map_core/iterators/CircleIterator.hpp>
 
 using namespace sbmpo;
-namespace sbmpo_ext {
+namespace model {
 
     typedef Eigen::Vector2d Vector;
     typedef std::pair<Vector, float> Obstacle;
@@ -32,7 +32,9 @@ namespace sbmpo_ext {
     #define NUM_SAMPLES 11
     Control controls[NUM_SAMPLES];
 
-    bool initialize(Planner &planner) {
+    static Planner * planner;
+
+    bool initialize(Planner &_planner) {
         ROS_INFO("External Initialization");
         const std::string halton_path = ros::package::getPath("sbmpo_ros") + "/data/halton.csv";
         ROS_INFO("Finding Halton Data in '%s'", halton_path.c_str());
@@ -46,31 +48,28 @@ namespace sbmpo_ext {
             }
             ROS_INFO("  - (%.2f, %.2f)", controls[i][0], controls[i][1]);
         }
+        planner = &_planner;
         ROS_INFO("Initialized");
         return true;
     }
 
     // G-score increment for a given sample
-    float dg(const float dt, const float v, const float u) {
-        return abs(v) * dt;
+    float cost(const sbmpo::Node& current, const sbmpo::Node &next) {
+        return abs(current.control[0]) * planner->options.sample_time;
     }
 
-    // H-score for a given node
-    float h(const float x, const float y, const float w, const float gx, const float gy) {
-        const float dx = gx - x;
-        const float dy = gy - y;
-        float dw = atan2f(dy,dx) - w;
-        if (dw > M_PI || dw <= -M_PI)
-            dw += dw > M_PI ? -2.0f*M_PI : 2.0*M_PI;
-        const float dt = sqrtf(dx*dx + dy*dy)/0.6f + abs(dw)/0.785f;
-        return dg(dt, 0.6, 0.785);
+    // H-score for a given node 
+    float heuristic(const sbmpo::Node& current, const sbmpo::State& goal) {
+        const float dx = goal[0] - current.state[0];
+        const float dy = goal[1] - current.state[1];
+        return sqrtf(dx*dx + dy*dy);
     }
 
-    bool isValid(const float x, const float y, const float w) {
+    bool is_valid(const sbmpo::State& state) {
 
         // Find collision between body and obstacle or 
-        const Vector origin(x,y);
-        const Eigen::Matrix2d rotation = Eigen::Rotation2Dd(w).toRotationMatrix();
+        const Vector origin(state[0], state[1]);
+        const Eigen::Matrix2d rotation = Eigen::Rotation2Dd(state[2]).toRotationMatrix();
         for (int bd = 0; bd < 4; bd++) {
 
             const Vector x1 = rotation * body[bd] + origin;
@@ -115,15 +114,20 @@ namespace sbmpo_ext {
         return true;
     }
 
-    bool evaluate(Node &node, const Planner &planner, const int n) {
+    bool is_goal(const sbmpo::State& state) {
+        float sum = 0.0f;
+        for (int i = 0; i < state.size(); i++) {
+            const StateInfo &info = planner->options.state_info[i];
+            const float val = state[i];
+            if (info.goal_radius != -1.0f)
+                sum += powf((state[i] - info.goal_value) / info.goal_radius, 2.0f);
+        }
+        return sum <= 1.0f;
+    }
 
-        const Node& parent = planner.buffer[node.parent_id];
+    bool next_state(Node &node, const int n) {
 
-        const float v0 = parent.control[0];
-        const float u0 = parent.control[1];
-
-        const float gx = planner.options.state_info[0].goal_value;
-        const float gy = planner.options.state_info[1].goal_value;
+        const Node& parent = planner->buffer[node.parent_id];
 
         // Generate set of controls
         Control control = controls[n];
@@ -133,41 +137,35 @@ namespace sbmpo_ext {
 
         //ROS_INFO("Sample %d: (v = %.2f, u = %.2f)", n, v, u);
 
-        const float sample_time = planner.options.sample_time;
-        const float sample_time_increment = planner.options.sample_time_increment;
+        const float sample_time = planner->options.sample_time;
+        const float sample_time_increment = planner->options.sample_time_increment;
 
         float &x = node.state[0];
         float &y = node.state[1];
         float &w = node.state[2];
 
-        float &f = node.heuristic[0];
-        float &g = node.heuristic[1];
-
         for (float t = 0; t < sample_time; t += sample_time_increment) {
 
-            // New yaw
-            const float nw = w + u * sample_time_increment;
+            sbmpo::State next(3);
 
             // New position
-            const float nx = x + cosf(nw) * v * sample_time_increment;
-            const float ny = y + sinf(nw) * v * sample_time_increment;
+            next[0] = x + cosf(w) * v * sample_time_increment;
+            next[1] = y + sinf(w) * v * sample_time_increment;
+
+            // New yaw
+            next[2]= w + u * sample_time_increment;
 
             // Check if valid
-            if (!isValid(nx, ny, nw))
+            if (!is_valid(next))
                 return false;
 
             // Update positions if valid
-            w = nw; x = nx; y = ny;
+            x = next[0]; y = next[1]; w = next[2];
         }
 
         // Yaw angle wrapping, w = (-pi, pi]
         if (w >= 2.0*M_PI || w < 0.0f)
             w += w < 0.0f ? 2.0*M_PI : -2.0*M_PI;
-
-        // Increase g score
-        g += dg(sample_time, v, u);
-
-        f = g + h(x, y, w, gx, gy);
 
         //ROS_INFO("Add to queue: [%d](%.2f, %.2f, %.2f)", node.id, node.state[0], node.state[1], node.state[2]);
 

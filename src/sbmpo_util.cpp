@@ -1,4 +1,4 @@
-#include <sbmpo_ros/sbmpo_util.hpp>
+#include <sbmpo_ros/sbmpo/sbmpo_util.hpp>
 
 namespace sbmpo {
 
@@ -39,17 +39,6 @@ namespace sbmpo {
         starting_node.generation = 0;
         starting_node.heuristic = {INFINITY, 0.0};
         return starting_node;
-    }
-
-    bool isGoal(const State &state, const StateInfoList &info_list) {
-        float sum = 0.0f;
-        for (int i = 0; i < state.size(); i++) {
-            const StateInfo &info = info_list[i];
-            const float val = state[i];
-            if (info.goal_radius != -1.0f)
-                sum += powf((state[i] - info.goal_value) / info.goal_radius, 2.0f);
-        }
-        return sum <= 1.0f;
     }
 
     void updateSuccessors(Node &node, Planner& planner, const float diff, const Index start) {

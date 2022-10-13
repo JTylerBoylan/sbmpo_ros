@@ -1,8 +1,8 @@
 #ifndef SBMPO_HPP
 #define SBMPO_HPP
 
-#include <sbmpo_ros/sbmpo_extern.hpp>
-#include <sbmpo_ros/sbmpo_util.hpp>
+#include <sbmpo_ros/model.hpp>
+#include <sbmpo_ros/sbmpo/sbmpo_util.hpp>
 
 namespace sbmpo {;
 

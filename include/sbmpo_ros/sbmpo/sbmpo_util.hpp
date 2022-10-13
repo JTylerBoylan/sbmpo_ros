@@ -1,7 +1,7 @@
 #ifndef SBMPO_UTIL_HPP
 #define SBMPO_UTIL_HPP
 
-#include <sbmpo_ros/sbmpo_types.hpp>
+#include <sbmpo_ros/sbmpo/sbmpo_types.hpp>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -28,9 +28,6 @@ namespace sbmpo {
 
     // Generate the starting
     Node startingNode(const PlannerOptions &options);
-
-    // Determine if state is goal
-    bool isGoal(const State &state, const StateInfoList &info_list);
 
     // Subtract g score from all successor nodes by some value
     void updateSuccessors(Node &node, Planner &planner, const float diff, const Index start);

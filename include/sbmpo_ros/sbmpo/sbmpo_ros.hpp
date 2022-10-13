@@ -2,7 +2,7 @@
 #define SBMPO_ROS_HPP
 
 #include <ros/ros.h>
-#include <sbmpo_ros/sbmpo.hpp>
+#include <sbmpo_ros/sbmpo/sbmpo.hpp>
 #include <grid_map_core/GridMap.hpp>
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/PoseArray.h>

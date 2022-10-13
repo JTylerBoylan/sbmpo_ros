@@ -1,4 +1,4 @@
-#include <sbmpo_ros/sbmpo_ros.hpp>
+#include <sbmpo_ros/sbmpo/sbmpo_ros.hpp>
 
 namespace sbmpo {
 
@@ -56,6 +56,7 @@ namespace sbmpo {
                     ROS_ERROR("Unknown state parameter: %s", section.c_str());
                 }
             }
+            planner.options.goal.push_back(state_info.goal_value);
             planner.options.state_info.push_back(state_info);
         }
 

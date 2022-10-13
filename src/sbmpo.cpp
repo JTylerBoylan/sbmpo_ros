@@ -1,4 +1,4 @@
-#include <sbmpo_ros/sbmpo.hpp>
+#include <sbmpo_ros/sbmpo/sbmpo.hpp>
 
 //#include <ros/ros.h>
 
@@ -32,7 +32,7 @@ namespace sbmpo {
             Node node = buffer[best];
 
             // Goal check
-            if (isGoal(node.state, options.state_info))
+            if (model::is_goal(node.state))
                 break;
 
             // Generation check
@@ -85,8 +85,14 @@ namespace sbmpo {
         child.control = node.control;
 
         // Evaluate using external function
-        if (!sbmpo_ext::evaluate(child, planner, n))
+        if (!model::next_state(child, n))
             return INVALID_INDEX;
+
+        // Calculate edge cost
+        child.heuristic[1] += model::cost(child, node);
+
+        // Calculate new f score
+        child.heuristic[0] = child.heuristic[1] + model::heuristic(child, planner.options.goal);
 
         // Get location on implicit grid
         Index& grid_node_index = toNodeIndex(child, planner.grid);
