@@ -6,8 +6,8 @@ states:
       goal_radius: 0.3
     implicit_grid:
       active: true
-      resolution: 0.075
-      size: 100
+      resolution: 0.15
+      size: 50
 
   - name: 'Y'
     value:
@@ -16,8 +16,8 @@ states:
       goal_radius: 0.3
     implicit_grid:
       active: true
-      resolution: 0.075
-      size: 100
+      resolution: 0.15
+      size: 50
 
   - name: 'W'
     value:
@@ -26,8 +26,8 @@ states:
       goal_radius: -1.0
     implicit_grid:
       active: true
-      resolution: 0.31416
-      size: 20
+      resolution: 0.62832
+      size: 10
 
 controls:
   - name: 'V'

@@ -55,7 +55,7 @@ namespace model {
 
     // G-score increment for a given sample
     float cost(const sbmpo::Node& current, const sbmpo::Node &next) {
-        return abs(current.control[0]) * planner->options.sample_time;
+        return (abs(current.control[0]) + abs(current.control[1])) * planner->options.sample_time;
     }
 
     // H-score for a given node 
@@ -153,7 +153,7 @@ namespace model {
             next[1] = y + sinf(w) * v * sample_time_increment;
 
             // New yaw
-            next[2]= w + u * sample_time_increment;
+            next[2] = w + u * sample_time_increment;
 
             // Check if valid
             if (!is_valid(next))
