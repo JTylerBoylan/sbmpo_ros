@@ -7,18 +7,18 @@ namespace sbmpo {
 
     // Parameters
 
-    const float max_velocity = 1.0f;
+    const float max_velocity = 0.5f;
     const float max_rotation = M_PI / 60.0;
 
-    const float body_mass = 10.0f; // kg
-    const float body_moment = 100.0f; // kg m^2
+    const float body_mass = 2.5f; // kg
+    const float body_moment = 0.0625f; // kg m^2
 
     const float drag_force = 10.0f; // J/m
 
     const float forward_factor = 1.0;
     const float reverse_factor = 2.0;
 
-    const float gravity_force = 10.0f; // J/m
+    const float gravity_force = body_mass * 1.62; // J/m
 
     const float uphill_factor = 1.0f;
     const float downhill_factor = 0.25f;
@@ -27,34 +27,42 @@ namespace sbmpo {
     const float decceleration_factor = 0.25f;
     const float rotational_factor = 1.0f;
 
-    const float heat_transfer = 5e-10f;
+    const float heat_transfer = body_mass * 900; // J/K
+    const float motor_gen = 0; // W
+    const float robot_area = 0.08; //m^2
+    const float epsilon_g = 0.95;
+    const float epsilon_out = 1.0;
+    const float sigma = 0.0000000567;
+    const float T_out4 = 53.1441;
+    const float emissivity = 0.15;
+    const float k_leg = 170;
+    const float legs_area = 0.0005;
+    const float L_leg = 0.2;
 
     const float hot_factor = 0.0f;
     const float cool_factor = 100.0f;
 
     const float desired_temperature = 300.0f;
-    const float initial_temperature = 350.0f;
+    const float initial_temperature = 300.0f;
 
     const float map2temp_a = -520.0f;
     const float map2temp_b = 26.0f;
     const float map2temp_c = 400.0f;
 
     const Control controls[3] = {
-        {0.75f, -0.0524f},
-        {1.0f, 0.0f},
-        {0.75f, 0.0524f}
+        {0.5f, -0.0524f},
+        {0.5f, 0.0f},
+        {0.5f, 0.0524f}
     };
 
     // G-score increment for a given sample
     float dg(const float dt, const float v1, const float v2, const float u1, const float u2,
-                        const float z1, const float z2, const float T) {
+                        const float z1, const float z2, const float T, const float T_map) {
 
         const float dv = v2 - v1;
         const float du = u2 - u1;
         const float dz = z2 - z1;
 
-        const float kinetic_factor = v1 > 0 ? 1 : -1;
-        const float rotation_factor = u1 > 0 ? 1 : -1;
         const float direction_factor = v2 > 0 ? forward_factor : reverse_factor;
         const float potential_factor = dz > 0 ? uphill_factor : downhill_factor;
         const float accel_factor = dv > 0 ? acceleration_factor : decceleration_factor;
@@ -64,12 +72,14 @@ namespace sbmpo {
 
         const float drag_energy = drag_force * abs(v2) * dt * direction_factor;
         const float potential_energy = gravity_force * abs(dz) * potential_factor;
-        const float kinetic_energy = 0.5 * body_mass * abs(v2*v2 - kinetic_factor*v1*v1);
-        const float rotation_energy = 0.5 * body_moment * abs(u2*u2 - rotation_factor*u1*u1);
+        const float kinetic_energy = body_mass * abs(dv) * abs(v2);
+        const float rotation_energy = body_moment * abs(du) * abs(u2);
 
+        const float ground_factor = T_map > 300 ? 0.001 : 0.01;
+        const float ground_energy = powf(T_map - 300, 2.0f) * ground_factor;
         const float temperature_energy = abs(dT) * temperature_factor;
 
-        return drag_energy + potential_energy + kinetic_energy + rotation_energy + temperature_energy;
+        return drag_energy + potential_energy + kinetic_energy + rotation_energy + temperature_energy + ground_energy;
     }
 
     // H-score for a given node
@@ -82,7 +92,7 @@ namespace sbmpo {
         const float dt = sqrtf(dx*dx + dy*dy)/max_velocity + abs(dw)/max_rotation;
         const float z2 = map->atPosition("elevation", grid_map::Position(gx, gy));
         const float z1 = map->atPosition("elevation", grid_map::Position(x, y));
-        return dg(dt, v, max_velocity, u, max_rotation, z1, z1, desired_temperature);
+        return dg(dt, v, max_velocity, u, max_rotation, z1, z1, desired_temperature, 300);
     }
 
     bool evaluate(Node &node, const Planner &planner, const int n) {
@@ -118,12 +128,12 @@ namespace sbmpo {
         grid_map::Position position;
         for (float t = 0; t < sample_time; t += sample_time_increment) {
 
+            // New position
+            const float nx = x + cosf(w) * v * sample_time_increment;
+            const float ny = y + sinf(w) * v * sample_time_increment;
+
             // New yaw
             const float nw = w + u * sample_time_increment;
-
-            // New position
-            const float nx = x + cosf(nw) * v * sample_time_increment;
-            const float ny = y + sinf(nw) * v * sample_time_increment;
 
             // Bounds check
             position = grid_map::Position(nx,ny);
@@ -145,15 +155,17 @@ namespace sbmpo {
         // Get temperature from map
         // T_K = a*T_map^2 + b*T_map + c
         const float T_map = map->atPosition("temperature", position);
+        const float T_inv = (1.0f - T_map);
         const float T_K = map2temp_a * powf(T_map, 2.0f) + map2temp_b * T_map + map2temp_c;
 
         // m*c*dT/dt = e*o*A*(Ts^4 - T^4) --> dT = (e*o*A)/(m*c) * (Ts^4 - T^4) * dt
 
         // Increase body temperature
-        T += heat_transfer * (powf(T_K, 4.0f) - powf(T, 4.0f)) * sample_time;
+        T += sample_time / heat_transfer * (motor_gen + T_inv * robot_area + epsilon_g*sigma*robot_area*powf(T_K, 4.0f) + epsilon_out*sigma*robot_area*T_out4
+                    - 2.0*emissivity*sigma*robot_area*powf(T, 4.0f) - k_leg * legs_area / L_leg * (T - T_K));
 
         // Increase g score
-        g += dg(sample_time, v0, v, u0, u, z0, z, T);
+        g += dg(sample_time, v0, v, u0, u, z0, z, T, T_K);
 
         f = g + h(x, y, w, v, u, gx, gy);
 

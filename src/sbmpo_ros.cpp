@@ -155,6 +155,8 @@ namespace sbmpo {
             pose.header.frame_id = map.getFrameId();
             pose.pose = toPose(planner.buffer[i], map);
             path.poses.push_back(pose);
+            Node n = planner.buffer[i];
+            ROS_INFO("[%d] x: %.2f, y: %.2f, w: %.2f, T: %.2f, v: %.2f, u: %.2f, f: %.2f, g: %.2f", n.id, n.state[0], n.state[1], n.state[2], n.state[3], n.control[0], n.control[1], n.heuristic[0], n.heuristic[1]);
         }
     }
 
